@@ -20,7 +20,6 @@ import suyaImg from '../assets/images/nigerian_suya_prawns_1790149701081.jpg';
 interface HeroProps {
   onBookTable: () => void;
   onExploreMenu: () => void;
-  onExploreFloorPlan: () => void;
 }
 
 interface ShowcaseItem {
@@ -39,7 +38,6 @@ interface ShowcaseItem {
 export const Hero: React.FC<HeroProps> = ({
   onBookTable,
   onExploreMenu,
-  onExploreFloorPlan,
 }) => {
   const showcaseItems: ShowcaseItem[] = [
     {
@@ -231,13 +229,6 @@ export const Hero: React.FC<HeroProps> = ({
                 <ArrowRight className="w-3.5 h-3.5 text-[#14532D]" />
               </button>
 
-              <button
-                onClick={onExploreFloorPlan}
-                className="px-3.5 py-3.5 text-xs font-semibold text-[#595852] hover:text-[#121110] transition-colors flex items-center gap-1.5 cursor-pointer"
-              >
-                <Compass className="w-4 h-4 text-[#C2410C]" />
-                <span>Pavilion Plan</span>
-              </button>
             </div>
 
             {/* Quiet Hallmark Metrics Strip — Unboxed & Refined */}

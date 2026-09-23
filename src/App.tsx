@@ -18,10 +18,8 @@ import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { MenuSection } from './components/MenuSection';
-import { RestaurantDiagramSection } from './components/RestaurantDiagramSection';
 import { DishModal } from './components/DishModal';
 import { ReservationSection } from './components/ReservationSection';
-import { GoogleMapsAgent } from './components/GoogleMapsAgent';
 import { CartDrawer } from './components/CartDrawer';
 import { OrderTrackerModal } from './components/OrderTrackerModal';
 import { StorySection } from './components/StorySection';
@@ -49,7 +47,7 @@ function MainApp() {
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [isStaffMode, setIsStaffMode] = useState<boolean>(false);
   const [staffRole, setStaffRole] = useState<StaffRole>('owner');
-  const [preSelectedZone, setPreSelectedZone] = useState<string>('eko-grand');
+
 
   // Table QR Session State
   const [isScanQROpen, setIsScanQROpen] = useState(false);
@@ -197,10 +195,6 @@ function MainApp() {
     }
   };
 
-  const handleSelectZoneFromDiagram = (zoneId: string) => {
-    setPreSelectedZone(zoneId);
-    scrollToSection('reservation');
-  };
 
   const handleOpenLegal = (tab: 'privacy' | 'terms') => {
     setLegalTab(tab);
@@ -259,7 +253,6 @@ function MainApp() {
               <Hero
                 onBookTable={() => scrollToSection('reservation')}
                 onExploreMenu={() => scrollToSection('menu')}
-                onExploreFloorPlan={() => scrollToSection('diagram')}
               />
 
               {/* Dynamic Categorized Culinary Menu & Live Ordering */}
@@ -270,23 +263,13 @@ function MainApp() {
                 onOpenMenuManager={() => setIsMenuManagerOpen(true)}
               />
 
-              {/* Illustrated Cartoon Diagram & Architectural Floor Plan */}
-              <RestaurantDiagramSection
-                onSelectZoneForReservation={handleSelectZoneFromDiagram}
-              />
-
               {/* Double-Booking Prevention Table Reservation System */}
               <ReservationSection
                 seatingAreas={seatingAreas}
-                preSelectedAreaId={preSelectedZone}
                 onReservationComplete={() => {
                   // reservation completed
                 }}
-                onViewDiagram={() => scrollToSection('diagram')}
               />
-
-              {/* Google Maps Real-Time Location, Directions & Transit Agent */}
-              <GoogleMapsAgent />
 
               {/* Nigerian Woodfire & Heritage Story */}
               <StorySection />

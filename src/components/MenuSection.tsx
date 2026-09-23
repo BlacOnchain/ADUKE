@@ -71,15 +71,7 @@ export const MenuSection: React.FC<MenuSectionProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <button
-              onClick={onOpenMenuManager}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-[#F4F3ED] border border-[#E8E6DD] text-[#121110] text-xs font-semibold rounded-xl transition-all cursor-pointer shadow-2xs"
-            >
-              <Settings className="w-3.5 h-3.5 text-[#14532D]" />
-              <span>Update Menu & Prices</span>
-            </button>
-          </div>
+
         </div>
 
         {/* Category Navigation & Search Filter Controls */}
