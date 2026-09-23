@@ -36,7 +36,6 @@ export const NotificationSubscriptionModal: React.FC<NotificationSubscriptionMod
     notificationService.getHistory()
   );
   const [requesting, setRequesting] = useState(false);
-  const [testSent, setTestSent] = useState(false);
 
   useEffect(() => {
     if (notificationService.isSupported()) {
@@ -73,12 +72,6 @@ export const NotificationSubscriptionModal: React.FC<NotificationSubscriptionMod
       return;
     }
     notificationService.toggleBrowserPush();
-  };
-
-  const handleSendTest = () => {
-    notificationService.sendTestNotification();
-    setTestSent(true);
-    setTimeout(() => setTestSent(false), 2500);
   };
 
   const handleClearHistory = () => {
@@ -228,17 +221,7 @@ export const NotificationSubscriptionModal: React.FC<NotificationSubscriptionMod
               </div>
             </div>
 
-            {/* Test Alert Trigger */}
-            <div className="pt-1">
-              <button
-                type="button"
-                onClick={handleSendTest}
-                className="w-full py-2.5 px-4 bg-white hover:bg-[#FAFAF7] border border-[#E8E6DD] rounded-xl text-xs font-semibold text-[#121110] flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-[#C89B3C]" />
-                <span>{testSent ? '✓ Alert Dispatched!' : 'Send Test Notification to This Device'}</span>
-              </button>
-            </div>
+
           </div>
 
           {/* Activity Stream / History */}

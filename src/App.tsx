@@ -14,7 +14,7 @@ import {
   TableSession,
   StaffRole,
 } from './types/restaurant';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { MenuSection } from './components/MenuSection';
@@ -35,19 +35,10 @@ import { CookieConsent } from './components/CookieConsent';
 import { LegalModal } from './components/LegalModal';
 import { OrderHistoryDashboard } from './components/OrderHistoryDashboard';
 
-import { BrowserRouter, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { AdminLogin } from './components/AdminLogin';
-import { useAuth } from './context/AuthContext';
 
-
-function MainContent() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const isAdminRoute = location.pathname.startsWith('/admin');
-
-  const { profile } = useAuth();
-  const isStaffLoggedIn = profile && profile.role !== 'customer';
-
+function MainApp() {
   // DB Reactive State
   const [menu, setMenu] = useState<MenuItem[]>(() => restaurantDB.getMenu());
   const [seatingAreas] = useState(() => restaurantDB.getSeatingAreas());
@@ -94,7 +85,6 @@ function MainContent() {
   const [selectedDish, setSelectedDish] = useState<MenuItem | null>(null);
   const [trackerOrder, setTrackerOrder] = useState<RestaurantOrder | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [isMenuManagerOpen, setIsMenuManagerOpen] = useState(false);
 
   // Subscribe to DB updates
   useEffect(() => {
@@ -208,31 +198,6 @@ function MainContent() {
     setIsLegalOpen(true);
   };
 
-  // If we are on the admin route, render the Staff Portal or Login completely separate
-  if (isAdminRoute) {
-    if (!isStaffLoggedIn) {
-      return <AdminLogin />;
-    }
-    return (
-      <>
-        <StaffDashboard
-          orders={orders}
-          reservations={reservations}
-          menu={menu}
-          currentRole={profile.role as StaffRole}
-          onClose={() => navigate('/')}
-          onOpenMenuManager={() => setIsMenuManagerOpen(true)}
-        />
-        <MenuManagementModal
-          isOpen={isMenuManagerOpen}
-          onClose={() => setIsMenuManagerOpen(false)}
-          menu={menu}
-        />
-      </>
-    );
-  }
-
-  // Otherwise, render the Guest Public Interface
   return (
     <div className="min-h-screen bg-[#FAFAF7] text-[#121110] flex flex-col selection:bg-[#14532D] selection:text-white">
       
@@ -249,8 +214,8 @@ function MainContent() {
         activeTableSession={activeTableSession}
         activeOrder={activeOrder}
         onOpenTracker={() => setTrackerOrder(activeOrder || orders[0] || null)}
-        isStaffMode={false} // Removed
-        onToggleStaffMode={() => {}} // Removed
+        isStaffMode={false}
+        onToggleStaffMode={() => {}}
         onOpenAuth={() => setIsAuthOpen(true)}
         onOpenMenuManager={() => {}}
       />
@@ -359,11 +324,47 @@ function MainContent() {
   );
 }
 
+function AdminRouteWrapper() {
+  const { profile } = useAuth();
+  const navigate = useNavigate();
+  const isStaffLoggedIn = profile && profile.role !== 'customer';
+  const [isMenuManagerOpen, setIsMenuManagerOpen] = useState(false);
+
+  const orders = restaurantDB.getOrders();
+  const reservations = restaurantDB.getReservations();
+  const menu = restaurantDB.getMenu();
+
+  if (!isStaffLoggedIn) {
+    return <AdminLogin />;
+  }
+
+  return (
+    <>
+      <StaffDashboard
+        orders={orders}
+        reservations={reservations}
+        menu={menu}
+        currentRole={(profile?.role as StaffRole) || 'owner'}
+        onClose={() => navigate('/')}
+        onOpenMenuManager={() => setIsMenuManagerOpen(true)}
+      />
+      <MenuManagementModal
+        isOpen={isMenuManagerOpen}
+        onClose={() => setIsMenuManagerOpen(false)}
+        menu={menu}
+      />
+    </>
+  );
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <MainContent />
+        <Routes>
+          <Route path="/admin" element={<AdminRouteWrapper />} />
+          <Route path="/*" element={<MainApp />} />
+        </Routes>
       </AuthProvider>
     </BrowserRouter>
   );

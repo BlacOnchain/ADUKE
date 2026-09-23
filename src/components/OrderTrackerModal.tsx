@@ -28,60 +28,6 @@ interface OrderTrackerModalProps {
 export const OrderTrackerModal: React.FC<OrderTrackerModalProps> = ({ order, onClose, onStatusChange }) => {
   if (!order) return null;
 
-  const [permission, setPermission] = useState<NotificationPermission>(() =>
-    notificationService.getPermission()
-  );
-  const [isSubscribed, setIsSubscribed] = useState<boolean>(() =>
-    notificationService.isSubscribedToOrder(order.id)
-  );
-  const [subscribing, setSubscribing] = useState(false);
-  const [testSent, setTestSent] = useState(false);
-
-  useEffect(() => {
-    setIsSubscribed(notificationService.isSubscribedToOrder(order.id));
-    if (notificationService.isSupported()) {
-      setPermission(notificationService.getPermission());
-    }
-
-    const unsub = notificationService.subscribe(() => {
-      setIsSubscribed(notificationService.isSubscribedToOrder(order.id));
-      if (notificationService.isSupported()) {
-        setPermission(notificationService.getPermission());
-      }
-    });
-
-    return () => unsub();
-  }, [order.id]);
-
-  const handleToggleSubscription = async () => {
-    if (permission !== 'granted') {
-      setSubscribing(true);
-      const res = await notificationService.requestPermission();
-      setPermission(res);
-      setSubscribing(false);
-      if (res === 'granted') {
-        notificationService.subscribeToOrder(order.id);
-        setIsSubscribed(true);
-      }
-      return;
-    }
-
-    if (isSubscribed) {
-      notificationService.unsubscribeFromOrder(order.id);
-      setIsSubscribed(false);
-    } else {
-      notificationService.subscribeToOrder(order.id);
-      setIsSubscribed(true);
-      notificationService.playChime();
-    }
-  };
-
-  const handleSendTestNotification = () => {
-    notificationService.sendTestNotification();
-    setTestSent(true);
-    setTimeout(() => setTestSent(false), 2000);
-  };
-
   const stages: { status: OrderStatus; title: string; subtitle: string; icon: React.ReactNode }[] = [
     {
       status: 'placed',
@@ -173,58 +119,7 @@ export const OrderTrackerModal: React.FC<OrderTrackerModalProps> = ({ order, onC
           </div>
         </div>
 
-        {/* Notification Subscription Banner */}
-        <div className="p-4 bg-[#FAFAF7] border-b border-[#E8E6DD] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-          <div className="flex items-start gap-2.5">
-            <div className={`p-2 rounded-xl shrink-0 ${isSubscribed && permission === 'granted' ? 'bg-[#DCFCE7] text-[#14532D]' : 'bg-white border border-[#E8E6DD] text-[#8C8A82]'}`}>
-              {isSubscribed && permission === 'granted' ? <BellRing className="w-4 h-4 text-[#14532D]" /> : <Bell className="w-4 h-4 text-[#595852]" />}
-            </div>
-            <div>
-              <div className="font-bold text-[#121110] flex items-center gap-1.5">
-                <span>Real-Time Browser Notifications</span>
-                {isSubscribed && permission === 'granted' && (
-                  <span className="px-1.5 py-0.2 rounded bg-[#14532D] text-white text-[9px] font-mono">ACTIVE</span>
-                )}
-              </div>
-              <p className="text-[11px] text-[#595852]">
-                {permission === 'granted' && isSubscribed
-                  ? 'Alerts active. You will receive push notifications as each dish cooks & delivers.'
-                  : permission === 'denied'
-                  ? 'Notifications are blocked in your browser settings. You can still see in-app updates.'
-                  : 'Receive push alerts on this device as your order progresses through each kitchen stage.'}
-              </p>
-            </div>
-          </div>
 
-          <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-            {permission === 'granted' && (
-              <button
-                type="button"
-                onClick={handleSendTestNotification}
-                className="px-2.5 py-1.5 bg-white hover:bg-[#F4F3ED] border border-[#E8E6DD] text-[#121110] font-semibold text-[11px] rounded-lg transition-all cursor-pointer"
-              >
-                {testSent ? '✓ Alert Sent' : 'Test Alert'}
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={handleToggleSubscription}
-              disabled={subscribing}
-              className={`px-3 py-1.5 font-bold text-xs rounded-xl transition-all shadow-2xs cursor-pointer ${
-                isSubscribed && permission === 'granted'
-                  ? 'bg-white border border-[#E8E6DD] text-[#595852] hover:text-rose-600'
-                  : 'bg-[#14532D] hover:bg-[#0D3823] text-white'
-              }`}
-            >
-              {subscribing
-                ? 'Requesting...'
-                : isSubscribed && permission === 'granted'
-                ? 'Unsubscribe'
-                : 'Turn On Alerts'}
-            </button>
-          </div>
-        </div>
 
         {/* Timeline Progression */}
         <div className="p-6 sm:p-8 space-y-6">
