@@ -30,6 +30,8 @@ import { StaffDashboard } from './components/StaffDashboard';
 import { AuthModal } from './components/AuthModal';
 import { MenuManagementModal } from './components/MenuManagementModal';
 import { ScanQR } from './components/ScanQR';
+import { NotificationToast } from './components/NotificationToast';
+import { NotificationSubscriptionModal } from './components/NotificationSubscriptionModal';
 import { Footer } from './components/Footer';
 import { CookieConsent } from './components/CookieConsent';
 import { LegalModal } from './components/LegalModal';
@@ -51,6 +53,9 @@ function MainApp() {
   // Table QR Session State
   const [isScanQROpen, setIsScanQROpen] = useState(false);
   const [activeTableSession, setActiveTableSession] = useState<TableSession | null>(null);
+
+  // Notification Subscription Modal State
+  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
 
   // Legal Modal State
   const [isLegalOpen, setIsLegalOpen] = useState(false);
@@ -204,6 +209,7 @@ function MainApp() {
         onOpenCart={() => setIsCartOpen(true)}
         onOpenReservation={() => scrollToSection('reservation')}
         onOpenScanQR={() => setIsScanQROpen(true)}
+        onOpenNotifications={() => setIsNotificationModalOpen(true)}
         activeTableSession={activeTableSession}
         activeOrder={activeOrder}
         onOpenTracker={() => setTrackerOrder(activeOrder || orders[0] || null)}
@@ -346,6 +352,16 @@ function MainApp() {
         onClose={() => setIsLegalOpen(false)}
         initialTab={legalTab}
       />
+
+      {/* Real-time Order Notification Subscription Service Modal */}
+      <NotificationSubscriptionModal
+        isOpen={isNotificationModalOpen}
+        onClose={() => setIsNotificationModalOpen(false)}
+        activeOrderNumber={activeOrder?.orderNumber}
+      />
+
+      {/* Real-time In-App Order Status Toast Banner */}
+      <NotificationToast />
 
       {/* Discrete Cookie Preferences Banner */}
       <CookieConsent />

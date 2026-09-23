@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { ShoppingBag, Utensils, User, LogOut, Shield, Menu, X, QrCode, Sparkles } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ShoppingBag, Utensils, User, LogOut, Shield, Menu, X, QrCode, Sparkles, Bell } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { RestaurantOrder, TableSession, formatNaira } from '../types/restaurant';
+import { notificationService } from '../services/notificationService';
 
 interface NavbarProps {
   activeSection: string;
@@ -11,6 +12,7 @@ interface NavbarProps {
   onOpenCart: () => void;
   onOpenReservation: () => void;
   onOpenScanQR: () => void;
+  onOpenNotifications: () => void;
   activeTableSession?: TableSession | null;
   activeOrder?: RestaurantOrder;
   onOpenTracker?: () => void;
@@ -28,6 +30,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenCart,
   onOpenReservation,
   onOpenScanQR,
+  onOpenNotifications,
   activeTableSession,
   activeOrder,
   onOpenTracker,
@@ -38,6 +41,17 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const { currentUser, profile, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [hasUnread, setHasUnread] = useState(false);
+
+  useEffect(() => {
+    const checkUnread = () => {
+      const history = notificationService.getHistory();
+      setHasUnread(history.some((h) => !h.read));
+    };
+    checkUnread();
+    const unsub = notificationService.subscribe(checkUnread);
+    return () => unsub();
+  }, []);
 
   const navLinks = [
     { id: 'menu', label: 'Culinary Menu' },
@@ -121,6 +135,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="font-mono">Order #{activeOrder.orderNumber}</span>
               </button>
             )}
+
+            {/* Notification Bell Button */}
+            <button
+              onClick={onOpenNotifications}
+              aria-label="Order notifications and subscription preferences"
+              title="Real-time order notifications"
+              className="relative p-2 rounded-xl text-[#121110] hover:bg-white bg-[#FAFAF7] border border-[#E8E6DD] transition-all cursor-pointer shadow-2xs"
+            >
+              <Bell className="w-4 h-4 text-[#14532D]" />
+              {hasUnread && (
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#C2410C] ring-2 ring-white animate-pulse" />
+              )}
+            </button>
 
             {/* Shopping Bag Button with Naira total */}
             <button

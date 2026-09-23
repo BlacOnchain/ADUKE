@@ -36,6 +36,7 @@ import {
   MenuItem
 } from '../types/restaurant';
 import { restaurantDB } from '../data/db';
+import { StaffAnalyticsWidget } from './StaffAnalyticsWidget';
 import confetti from 'canvas-confetti';
 
 interface StaffDashboardProps {
@@ -355,7 +356,10 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({
               </div>
             </div>
 
-            {/* Branch Performance & Top Sellers */}
+            {/* Interactive Staff Analytics Widget with Recharts */}
+            <StaffAnalyticsWidget orders={orders} menu={menu} />
+
+            {/* Branch Performance & Multi-Location Oversight */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-white border border-[#E8E6DD] rounded-3xl p-6 space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-[#F0EFEB]">
@@ -554,6 +558,9 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({
                 </table>
               </div>
             </div>
+
+            {/* General Manager Analytics & Shift Volume Forecast */}
+            <StaffAnalyticsWidget orders={orders} menu={menu} />
           </div>
         )}
 

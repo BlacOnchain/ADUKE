@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Bike, Store, Utensils, QrCode } from 'lucide-react';
 import { CartItem, OrderType, RestaurantOrder, TableSession, formatNaira } from '../types/restaurant';
 import { restaurantDB } from '../data/db';
+import { notificationService } from '../services/notificationService';
 import confetti from 'canvas-confetti';
 
 interface CartDrawerProps {
@@ -87,6 +88,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
         total,
         specialNotes: specialNotes.trim() || undefined,
       });
+
+      // Auto-subscribe order to real-time status notifications
+      try {
+        notificationService.subscribeToOrder(order.id);
+        if (notificationService.isSupported() && notificationService.getPermission() === 'default') {
+          notificationService.requestPermission().catch(() => {});
+        }
+      } catch {}
 
       setIsSubmitting(false);
       onClearCart();

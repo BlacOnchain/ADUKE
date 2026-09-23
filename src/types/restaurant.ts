@@ -157,6 +157,23 @@ export interface TableSession {
   activeOrderIds: string[];
 }
 
+export interface NotificationPreferences {
+  browserNotificationsEnabled: boolean;
+  soundEnabled: boolean;
+  subscribedOrderIds: string[];
+}
+
+export interface InAppNotification {
+  id: string;
+  orderId: string;
+  orderNumber: string;
+  title: string;
+  body: string;
+  status: OrderStatus;
+  timestamp: string;
+  read: boolean;
+}
+
 export function formatNaira(amount: number): string {
   return `₦${Math.round(amount).toLocaleString('en-NG')}`;
 }

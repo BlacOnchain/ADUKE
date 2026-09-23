@@ -8,6 +8,7 @@ import {
   deleteDoc,
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { notificationService } from '../services/notificationService';
 import {
   MenuItem,
   TableReservation,
@@ -567,6 +568,12 @@ export const restaurantDB = {
       setDoc(doc(db, 'orders', newOrder.id), newOrder).catch(() => {});
     } catch {}
 
+    // Subscribe user to real-time status notifications for this order
+    try {
+      notificationService.subscribeToOrder(newOrder.id);
+      notificationService.notifyOrderStatus(newOrder);
+    } catch {}
+
     emitChange();
     return newOrder;
   },
@@ -578,6 +585,15 @@ export const restaurantDB = {
     try {
       updateDoc(doc(db, 'orders', id), { status }).catch(() => {});
     } catch {}
+
+    // Dispatch real-time browser & in-app notification to subscribers
+    const order = updated.find((o) => o.id === id);
+    if (order) {
+      try {
+        notificationService.notifyOrderStatus(order);
+      } catch {}
+    }
+
     emitChange();
   },
 
