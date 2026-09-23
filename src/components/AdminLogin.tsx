@@ -3,19 +3,44 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
-import { Mail, Lock, AlertCircle, ArrowRight, ShieldCheck, Flame, Tablet, Receipt, TrendingUp, Sparkles, MapPin, Utensils } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Mail, Lock, AlertCircle, ArrowRight, ShieldCheck, Flame, Tablet, Receipt, TrendingUp, Sparkles, MapPin, Utensils, UserCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export const AdminLogin: React.FC = () => {
   const { signInWithEmail, logout } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   
-  const [email, setEmail] = useState('Odubelatomiwa508@gmail.com');
+  const inviteRole = searchParams.get('inviteRole');
+  const inviteToken = searchParams.get('token');
+
+  const [email, setEmail] = useState(
+    inviteRole === 'chef' ? 'chef@aduke.com' :
+    inviteRole === 'waiter' ? 'waiter@aduke.com' :
+    inviteRole === 'cashier' ? 'cashier@aduke.com' :
+    inviteRole === 'manager' ? 'manager@aduke.com' :
+    'Odubelatomiwa508@gmail.com'
+  );
   const [password, setPassword] = useState('BLAC: Password');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (inviteRole) {
+      const roleEmails: Record<string, string> = {
+        chef: 'chef@aduke.com',
+        waiter: 'waiter@aduke.com',
+        cashier: 'cashier@aduke.com',
+        manager: 'manager@aduke.com'
+      };
+      if (roleEmails[inviteRole]) {
+        setEmail(roleEmails[inviteRole]);
+        setPassword('password123');
+      }
+    }
+  }, [inviteRole]);
 
   const fillDemoStaff = (roleEmail: string, pass: string) => {
     setEmail(roleEmail);
@@ -116,6 +141,17 @@ export const AdminLogin: React.FC = () => {
               Authorized team members and management only
             </p>
           </div>
+
+          {/* Invite Banner if invite token is present */}
+          {inviteRole && (
+            <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-900 flex items-center gap-2.5">
+              <UserCheck className="w-5 h-5 shrink-0 text-emerald-700" />
+              <div>
+                <span className="font-bold block">CEO Invite Link Detected</span>
+                <span>Role: <strong className="uppercase">{inviteRole}</strong>. Sign in below to sync your dashboard.</span>
+              </div>
+            </div>
+          )}
 
           {/* Quick Hospitality Role Presets */}
           <div className="space-y-2">
