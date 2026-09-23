@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Àdùkẹ́ Gastronomy · Lagos</title>
+    <script type="text/javascript">
+      // Single Page App 404 Fallback for Static Hosts (Render, GitHub Pages, Netlify)
+      var segmentCount = 0;
+      var l = window.location;
+      var path = l.pathname.split('/').slice(1 + segmentCount).join('/');
+      var search = l.search ? l.search : '';
+      var hash = l.hash ? l.hash : '';
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + segmentCount).join('/') + '/?p=/' + path + (search ? '&' + search.slice(1) : '') + hash
+      );
+    </script>
+  </head>
+  <body></body>
+</html>

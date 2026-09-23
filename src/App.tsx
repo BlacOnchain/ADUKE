@@ -358,10 +358,24 @@ function AdminRouteWrapper() {
   );
 }
 
+function RedirectHandler() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const p = params.get('p');
+    if (p) {
+      window.history.replaceState({}, '', window.location.pathname + p + window.location.hash);
+      navigate(p, { replace: true });
+    }
+  }, [navigate]);
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <RedirectHandler />
         <Routes>
           <Route path="/admin" element={<AdminRouteWrapper />} />
           <Route path="/*" element={<MainApp />} />

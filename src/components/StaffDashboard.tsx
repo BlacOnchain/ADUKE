@@ -1,34 +1,13 @@
 import React, { useState } from 'react';
 import {
   ChefHat,
-  Calendar,
-  Clock,
-  CheckCircle2,
-  AlertTriangle,
-  ArrowRight,
-  RotateCcw,
-  X,
-  Users,
-  MapPin,
-  Phone,
-  Flame,
   Settings,
-  ShieldCheck,
-  TrendingUp,
-  CreditCard,
-  Tablet,
-  Receipt,
-  Bell,
-  Sparkles,
-  DollarSign,
-  Droplets,
-  Check,
-  Plus
+  X,
+  RotateCcw
 } from 'lucide-react';
 import {
   RestaurantOrder,
   TableReservation,
-  OrderStatus,
   StaffRole,
   TableSession,
   PaymentMethod,
@@ -37,7 +16,6 @@ import {
 } from '../types/restaurant';
 import { restaurantDB } from '../data/db';
 import { StaffAnalyticsWidget } from './StaffAnalyticsWidget';
-import confetti from 'canvas-confetti';
 
 interface StaffDashboardProps {
   orders: RestaurantOrder[];
@@ -65,15 +43,6 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({
     restaurantDB.getTableSessions()
   );
 
-  // Cashier settlement modal state
-  const [selectedTableForBilling, setSelectedTableForBilling] = useState<TableSession | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('pos_terminal');
-  const [settlementSuccess, setSettlementSuccess] = useState<string | null>(null);
-
-  // Waiter tablet fast ordering state
-  const [selectedWaiterTable, setSelectedWaiterTable] = useState<string>('Table 4');
-
-  // Sync tables
   const refreshTables = () => {
     setTableSessions([...restaurantDB.getTableSessions()]);
   };
@@ -83,92 +52,11 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({
     if (onRoleChange) onRoleChange(role);
   };
 
-  const handleUpdateOrderStatus = (orderId: string, newStatus: OrderStatus) => {
-    restaurantDB.updateOrderStatus(orderId, newStatus);
-  };
-
-  const handleUpdateReservationStatus = (resId: string, status: TableReservation['status']) => {
-    restaurantDB.updateReservationStatus(resId, status);
-  };
-
-  const handleClearBuzzer = (tableNumber: string) => {
-    restaurantDB.clearTableService(tableNumber);
-    refreshTables();
-  };
-
-  const handleUpdateTableStatus = (tableNumber: string, status: TableSession['status']) => {
-    restaurantDB.updateTableStatus(tableNumber, status);
-    refreshTables();
-  };
-
-  const handleSettleBill = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedTableForBilling) return;
-
-    restaurantDB.settleTableBill(selectedTableForBilling.tableNumber, paymentMethod);
-    refreshTables();
-    setSettlementSuccess(
-      `Payment of ${formatNaira(selectedTableForBilling.totalSpend)} confirmed via ${paymentMethod.toUpperCase().replace('_', ' ')}! Table marked ready for cleaning.`
-    );
-    try {
-      confetti({
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.6 },
-        colors: ['#14532D', '#C89B3C', '#C2410C'],
-      });
-    } catch {}
-
-    setTimeout(() => {
-      setSettlementSuccess(null);
-      setSelectedTableForBilling(null);
-    }, 2500);
-  };
-
-  const handleWaiterAddDish = (tableNumber: string, dish: MenuItem) => {
-    restaurantDB.createOrder({
-      orderType: 'dine-in-table',
-      tableNumber,
-      customerName: `Guest at ${tableNumber}`,
-      customerPhone: '+234 800 000 0000',
-      customerEmail: 'table.order@aduke.lagos.ng',
-      items: [
-        {
-          cartItemId: `waiter-${dish.id}-${Date.now()}`,
-          item: dish,
-          quantity: 1,
-          selectedOptions: [],
-          unitPrice: dish.price,
-          totalPrice: dish.price,
-        },
-      ],
-      subtotal: dish.price,
-      tax: Math.round(dish.price * 0.075),
-      deliveryFee: 0,
-      tip: 0,
-      total: Math.round(dish.price * 1.075),
-      paymentStatus: 'unpaid',
-      specialNotes: 'Added directly by floor waiter tablet',
-    });
-    refreshTables();
-    alert(`Added "${dish.name}" to ${tableNumber}. Ticket dispatched to Kitchen fire embers!`);
-  };
-
-  const handleResetData = () => {
-    if (confirm('Reset database to curated demonstration state with Nigerian Naira values?')) {
-      restaurantDB.resetAll();
-      refreshTables();
-    }
-  };
-
-  const activeOrders = orders.filter((o) => o.status !== 'completed' && o.status !== 'cancelled');
-  const pastOrders = orders.filter((o) => o.status === 'completed' || o.status === 'cancelled');
-
   return (
     <div className="min-h-screen bg-[#FAFAF7] text-[#121110] py-10 px-4 sm:px-6 lg:px-10">
       <div className="max-w-7xl mx-auto space-y-10">
 
-        {/* Standardized Header & Role Switcher */}
+        {/* Standardized Header & Clean Controls */}
         <div className="bg-white border border-[#E8E6DD] rounded-[28px] p-6 sm:p-8 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="flex items-center gap-5">
             <div className="w-14 h-14 rounded-2xl bg-[#14532D] text-white flex items-center justify-center shadow-md">
@@ -196,15 +84,6 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({
             >
               <Settings className="w-4 h-4 text-[#14532D]" />
               <span>Edit Menu & ₦ Prices</span>
-            </button>
-
-            <button
-              onClick={handleResetData}
-              title="Reset data"
-              className="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-[#666] hover:text-[#121110] bg-[#FAFAF7] hover:bg-[#E8E6DD]/60 border border-[#E8E6DD] rounded-xl transition-colors cursor-pointer shadow-2xs"
-            >
-              <RotateCcw className="w-4 h-4" />
-              <span>Reset ₦ Data</span>
             </button>
 
             <button
