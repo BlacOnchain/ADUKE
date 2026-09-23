@@ -11,7 +11,7 @@ export type NigerianDietBadge =
 export interface CustomizationOption {
   id: string;
   name: string;
-  price: number;
+  price: number; // in Naira
 }
 
 export interface CustomizationGroup {
@@ -28,7 +28,7 @@ export interface MenuItem {
   name: string;
   yorubaName?: string;
   category: MenuCategory;
-  price: number;
+  price: number; // in Nigerian Naira (NGN ₦)
   description: string;
   image: string;
   calories: number;
@@ -69,7 +69,8 @@ export interface SeatingArea {
 }
 
 export type OrderStatus = 'placed' | 'confirmed' | 'cooking' | 'ready' | 'completed' | 'cancelled';
-export type OrderType = 'delivery' | 'pickup' | 'dine-in-ahead';
+export type OrderType = 'delivery' | 'pickup' | 'dine-in-ahead' | 'dine-in-table';
+export type PaymentMethod = 'pos_terminal' | 'cash' | 'bank_transfer' | 'ussd';
 
 export interface RestaurantOrder {
   id: string;
@@ -87,6 +88,8 @@ export interface RestaurantOrder {
   tip: number;
   total: number;
   status: OrderStatus;
+  paymentStatus?: 'unpaid' | 'paid';
+  paymentMethod?: PaymentMethod;
   createdAt: string;
   estimatedDeliveryTime: string;
   specialNotes?: string;
@@ -125,11 +128,35 @@ export interface CustomerReview {
   verified: boolean;
 }
 
+export type StaffRole = 'owner' | 'manager' | 'chef' | 'cashier' | 'waiter' | 'customer';
+
 export interface UserProfile {
   uid: string;
   email: string | null;
   displayName: string | null;
   photoURL?: string | null;
   phoneNumber?: string | null;
-  role?: 'customer' | 'staff' | 'admin';
+  role?: StaffRole;
+  title?: string;
+  staffPin?: string;
+}
+
+export type TableServiceCall = 'none' | 'water' | 'bill' | 'waiter' | 'napkins' | 'clearing';
+export type TableStatus = 'vacant' | 'occupied' | 'service_needed' | 'billing' | 'dirty';
+
+export interface TableSession {
+  tableNumber: string; // e.g. "Table 4"
+  areaId: string;
+  areaName: string;
+  status: TableStatus;
+  guestName?: string;
+  guestCount?: number;
+  currentServiceCall: TableServiceCall;
+  openedAt?: string;
+  totalSpend: number;
+  activeOrderIds: string[];
+}
+
+export function formatNaira(amount: number): string {
+  return `₦${Math.round(amount).toLocaleString('en-NG')}`;
 }

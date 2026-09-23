@@ -11,6 +11,8 @@ import {
   RestaurantOrder,
   TableReservation,
   CustomerReview,
+  TableSession,
+  StaffRole,
 } from './types/restaurant';
 import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
@@ -27,6 +29,7 @@ import { ReviewsSection } from './components/ReviewsSection';
 import { StaffDashboard } from './components/StaffDashboard';
 import { AuthModal } from './components/AuthModal';
 import { MenuManagementModal } from './components/MenuManagementModal';
+import { ScanQR } from './components/ScanQR';
 import { Footer } from './components/Footer';
 import { CookieConsent } from './components/CookieConsent';
 import { LegalModal } from './components/LegalModal';
@@ -42,7 +45,12 @@ function MainApp() {
   // Navigation & View state
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [isStaffMode, setIsStaffMode] = useState<boolean>(false);
+  const [staffRole, setStaffRole] = useState<StaffRole>('owner');
   const [preSelectedZone, setPreSelectedZone] = useState<string>('eko-grand');
+
+  // Table QR Session State
+  const [isScanQROpen, setIsScanQROpen] = useState(false);
+  const [activeTableSession, setActiveTableSession] = useState<TableSession | null>(null);
 
   // Legal Modal State
   const [isLegalOpen, setIsLegalOpen] = useState(false);
@@ -195,6 +203,8 @@ function MainApp() {
         cartTotal={cartTotal}
         onOpenCart={() => setIsCartOpen(true)}
         onOpenReservation={() => scrollToSection('reservation')}
+        onOpenScanQR={() => setIsScanQROpen(true)}
+        activeTableSession={activeTableSession}
         activeOrder={activeOrder}
         onOpenTracker={() => setTrackerOrder(activeOrder || orders[0] || null)}
         isStaffMode={isStaffMode}
@@ -204,11 +214,14 @@ function MainApp() {
       />
 
       {isStaffMode ? (
-        /* Kitchen / Staff Management Screen */
+        /* Kitchen / Staff Management Screen with 5-tier Hierarchy Console */
         <main className="flex-1">
           <StaffDashboard
             orders={orders}
             reservations={reservations}
+            menu={menu}
+            currentRole={staffRole}
+            onRoleChange={(role) => setStaffRole(role)}
             onClose={() => setIsStaffMode(false)}
             onOpenMenuManager={() => setIsMenuManagerOpen(true)}
           />
@@ -275,6 +288,21 @@ function MainApp() {
         onRemoveItem={handleRemoveFromCart}
         onClearCart={handleClearCart}
         onOrderPlaced={handleOrderPlaced}
+        activeTableSession={activeTableSession}
+      />
+
+      {/* Table QR Scanning & Direct Table Ordering Simulator */}
+      <ScanQR
+        isOpen={isScanQROpen}
+        onClose={() => setIsScanQROpen(false)}
+        activeTableSession={activeTableSession}
+        onSelectTableSession={(session) => {
+          setActiveTableSession(session);
+        }}
+        onOrderForTable={() => {
+          setIsScanQROpen(false);
+          setIsCartOpen(true);
+        }}
       />
 
       {/* Dish Customization Modal */}
@@ -295,10 +323,14 @@ function MainApp() {
         }}
       />
 
-      {/* User Authentication Modal (Sign In, Sign Up, Password Recovery, Google Sign-In) */}
+      {/* User Authentication Modal with Guest & Staff Hierarchy Portals */}
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
+        onStaffLoginSuccess={(role) => {
+          setStaffRole(role);
+          setIsStaffMode(true);
+        }}
       />
 
       {/* Dynamic Menu & Price Management Modal (Staff / Admin Tool) */}

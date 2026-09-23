@@ -68,7 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         displayName: currentUser.displayName || currentUser.email?.split('@')[0] || 'Guest',
         photoURL: currentUser.photoURL,
         phoneNumber: currentUser.phoneNumber,
-        role: currentUser.email?.includes('admin') || currentUser.email?.includes('staff') ? 'staff' : 'customer',
+        role: currentUser.email?.includes('admin') || currentUser.email?.includes('staff') ? 'owner' : 'customer',
       }
     : null;
 

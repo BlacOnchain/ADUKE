@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Plus, Edit2, Trash2, CheckCircle2, DollarSign, Image as ImageIcon, Sparkles, Tag, Eye } from 'lucide-react';
-import { MenuItem, MenuCategory, NigerianDietBadge } from '../types/restaurant';
+import { MenuItem, MenuCategory, NigerianDietBadge, formatNaira } from '../types/restaurant';
 import { restaurantDB } from '../data/db';
 
 interface MenuManagementModalProps {
@@ -22,7 +22,7 @@ export const MenuManagementModal: React.FC<MenuManagementModalProps> = ({
   const [name, setName] = useState('');
   const [yorubaName, setYorubaName] = useState('');
   const [category, setCategory] = useState<MenuCategory>('mains');
-  const [price, setPrice] = useState<number>(25);
+  const [price, setPrice] = useState<number>(28000);
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [available, setAvailable] = useState(true);
@@ -49,7 +49,7 @@ export const MenuManagementModal: React.FC<MenuManagementModalProps> = ({
     setName('');
     setYorubaName('');
     setCategory('mains');
-    setPrice(28);
+    setPrice(28000);
     setDescription('');
     setImageUrl(menu[0]?.image || '');
     setAvailable(true);
@@ -214,7 +214,7 @@ export const MenuManagementModal: React.FC<MenuManagementModalProps> = ({
 
                   <div className="flex items-center gap-3 shrink-0">
                     <span className="font-mono text-xs font-bold text-[#121110]">
-                      ${dish.price.toFixed(2)}
+                      {formatNaira(dish.price)}
                     </span>
 
                     <button
@@ -298,13 +298,13 @@ export const MenuManagementModal: React.FC<MenuManagementModalProps> = ({
                   </div>
 
                   <div className="space-y-1">
-                    <label htmlFor="dish-price" className="font-semibold text-[#121110]">Price ($ USD) *</label>
+                    <label htmlFor="dish-price" className="font-semibold text-[#121110]">Price (₦ Naira) *</label>
                     <input
                       id="dish-price"
                       required
                       type="number"
-                      step="0.5"
-                      min="1"
+                      step="500"
+                      min="500"
                       value={price}
                       onChange={(e) => setPrice(Number(e.target.value))}
                       className="w-full px-3 py-2 bg-white border border-[#E8E6DD] rounded-xl text-[#121110] font-mono focus:outline-none focus:border-[#14532D]"

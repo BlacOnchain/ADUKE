@@ -419,12 +419,12 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                 </div>
 
                 <div className="space-y-1.5">
-                  <label htmlFor="res-guest-phone" className="block font-semibold text-[#121110]">Mobile Phone *</label>
+                  <label htmlFor="res-guest-phone" className="block font-semibold text-[#121110]">Nigerian / International Mobile *</label>
                   <input
                     id="res-guest-phone"
                     required
                     type="tel"
-                    placeholder="+1 (212) 000-0000"
+                    placeholder="+234 803 123 4567"
                     value={guestPhone}
                     onChange={(e) => setGuestPhone(e.target.value)}
                     className="w-full px-3.5 py-2.5 bg-[#FAFAF7] border border-[#E8E6DD] rounded-xl text-[#121110] focus:outline-none focus:border-[#14532D]"

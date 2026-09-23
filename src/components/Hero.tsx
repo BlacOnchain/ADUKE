@@ -24,7 +24,7 @@ export const Hero: React.FC<HeroProps> = ({
           <div className="flex items-center gap-3 text-xs tracking-wider uppercase font-medium text-[#595852]">
             <span className="text-[#14532D] font-bold">Àdùkẹ́ Gastronomy</span>
             <span aria-hidden="true" className="text-[#8C8A82]">·</span>
-            <span>174 Franklin Street, Tribeca</span>
+            <span>14 Adeola Odeku, Victoria Island, Lagos</span>
             <span aria-hidden="true" className="text-[#8C8A82]">·</span>
             <span>Firewood & Charcoal Embers</span>
           </div>
@@ -39,7 +39,7 @@ export const Hero: React.FC<HeroProps> = ({
 
           {/* Narrative Body */}
           <p className="text-base sm:text-lg text-[#595852] font-normal leading-relaxed max-w-2xl">
-            Where applewood smoke embraces slow-braised oxtail efo riro, hand-pounded yam, and char-blistered suya skewers. An intimate celebration of West African culinary craftsmanship in the heart of Tribeca.
+            Where applewood smoke embraces slow-braised oxtail efo riro, hand-pounded yam, and char-blistered suya skewers. An intimate celebration of West African culinary craftsmanship in the heart of Victoria Island, Lagos.
           </p>
 
           {/* Primary Action Buttons */}

@@ -66,14 +66,14 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenL
               <span>Location & Arrival</span>
             </h4>
             <div className="space-y-1.5 text-[#595852]">
-              <p className="text-[#121110] font-semibold">174 Franklin Street</p>
-              <p>Tribeca Historic District</p>
-              <p>New York, NY 10013</p>
+              <p className="text-[#121110] font-semibold">14 Adeola Odeku Street</p>
+              <p>Victoria Island</p>
+              <p>Lagos State, Nigeria</p>
               <p className="pt-1 text-[#8C8A82]">
-                Complimentary curbside valet welcomes you outside the canopy from 5:00 PM onwards.
+                Guarded courtyard parking and complimentary executive valet service from 12:00 PM onwards.
               </p>
               <p className="text-[#8C8A82]">
-                Subway: 1 train to Franklin St Station (2 min walk).
+                Transit: Falomo Bridge / Ozumba Mbadiwe corridor.
               </p>
             </div>
           </div>
@@ -85,9 +85,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenL
               <span>Direct Inquiries</span>
             </h4>
             <div className="space-y-1.5 text-[#595852]">
-              <p>Host Stand: <span className="font-mono font-semibold text-[#121110]">+1 (212) 555-8910</span></p>
-              <p>Sommelier Cellar: <span className="font-mono font-semibold text-[#121110]">+1 (212) 555-8912</span></p>
-              <p>Private Dining: <span className="text-[#14532D] underline font-medium">oba@aduke-dining.com</span></p>
+              <p>Host Concierge: <span className="font-mono font-semibold text-[#121110]">+234 1 460 8910</span></p>
+              <p>Floor Manager: <span className="font-mono font-semibold text-[#121110]">+234 803 555 1204</span></p>
+              <p>Private Dining: <span className="text-[#14532D] underline font-medium">concierge@aduke.lagos.ng</span></p>
               <div className="pt-2 flex items-center gap-2 text-[#8C8A82]">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#14532D]" />
                 <span>Protected by Google Cloud Firestore</span>

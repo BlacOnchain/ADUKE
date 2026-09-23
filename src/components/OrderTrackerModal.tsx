@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, CheckCircle2, Flame, Bike, PackageCheck, Clock, MapPin, ChefHat, Sparkles } from 'lucide-react';
-import { RestaurantOrder, OrderStatus } from '../types/restaurant';
+import { RestaurantOrder, OrderStatus, formatNaira } from '../types/restaurant';
 import { restaurantDB } from '../data/db';
 
 interface OrderTrackerModalProps {
@@ -98,7 +98,7 @@ export const OrderTrackerModal: React.FC<OrderTrackerModalProps> = ({ order, onC
           <div className="text-right">
             <span className="text-[11px] text-[#8C8A82] uppercase tracking-wider block">Total Paid</span>
             <span className="font-mono text-xl font-bold text-[#121110] tabular-nums">
-              ${order.total.toFixed(2)}
+              {formatNaira(order.total)}
             </span>
           </div>
         </div>
@@ -180,7 +180,7 @@ export const OrderTrackerModal: React.FC<OrderTrackerModalProps> = ({ order, onC
                     <span className="truncate">{i.item.name}</span>
                   </div>
                   <span className="font-mono tabular-nums text-[#121110] font-semibold shrink-0">
-                    ${i.totalPrice.toFixed(2)}
+                    {formatNaira(i.totalPrice)}
                   </span>
                 </div>
               ))}
@@ -197,7 +197,7 @@ export const OrderTrackerModal: React.FC<OrderTrackerModalProps> = ({ order, onC
 
         {/* Footer */}
         <div className="p-4 bg-[#FAFAF7] border-t border-[#E8E6DD] flex items-center justify-between text-xs text-[#8C8A82]">
-          <span>Need assistance? Call host: +1 (212) 555-8910</span>
+          <span>Need assistance? Concierge desk: +234 1 460 8910</span>
           <button
             onClick={onClose}
             className="px-4 py-2 bg-white border border-[#E8E6DD] hover:bg-[#F4F3ED] text-[#121110] font-medium rounded-xl transition-colors cursor-pointer"

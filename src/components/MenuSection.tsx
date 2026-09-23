@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Plus, Sparkles, SlidersHorizontal, Settings, Clock } from 'lucide-react';
-import { MenuItem, MenuCategory, NigerianDietBadge } from '../types/restaurant';
+import { MenuItem, MenuCategory, NigerianDietBadge, formatNaira } from '../types/restaurant';
 
 interface MenuSectionProps {
   menu: MenuItem[];
@@ -239,7 +239,7 @@ export const MenuSection: React.FC<MenuSectionProps> = ({
                   <div>
                     <span className="text-[10px] text-[#8C8A82] uppercase tracking-wider block">Price</span>
                     <span className="font-mono text-lg font-bold text-[#121110] tabular-nums">
-                      ${dish.price.toFixed(2)}
+                      {formatNaira(dish.price)}
                     </span>
                   </div>
 

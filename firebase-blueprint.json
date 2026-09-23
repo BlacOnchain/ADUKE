@@ -1,0 +1,68 @@
+{
+  "entities": {
+    "users": {
+      "fields": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "description": "User email address" },
+        "displayName": { "type": "string", "description": "User full name" },
+        "role": {
+          "type": "string",
+          "description": "User role: 'owner' (CEO), 'manager', 'chef', 'cashier', 'waiter', 'customer'"
+        },
+        "phoneNumber": { "type": "string", "description": "Nigerian or international contact number" },
+        "createdAt": { "type": "string", "description": "ISO creation timestamp" }
+      }
+    },
+    "menu": {
+      "fields": {
+        "name": { "type": "string" },
+        "yorubaName": { "type": "string" },
+        "category": { "type": "string" },
+        "price": { "type": "number", "description": "Price in Naira (NGN)" },
+        "description": { "type": "string" },
+        "image": { "type": "string" },
+        "available": { "type": "boolean" },
+        "tags": { "type": "array" }
+      }
+    },
+    "orders": {
+      "fields": {
+        "orderNumber": { "type": "string" },
+        "orderType": { "type": "string", "description": "dine-in-table, delivery, pickup" },
+        "tableNumber": { "type": "string", "description": "Target dining table e.g. Table 4" },
+        "customerName": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "items": { "type": "array" },
+        "subtotal": { "type": "number" },
+        "tax": { "type": "number" },
+        "total": { "type": "number" },
+        "status": { "type": "string" },
+        "paymentStatus": { "type": "string", "description": "unpaid, paid, settled" },
+        "assignedStaff": { "type": "string" }
+      }
+    },
+    "reservations": {
+      "fields": {
+        "bookingCode": { "type": "string" },
+        "guestName": { "type": "string" },
+        "guestEmail": { "type": "string" },
+        "guestPhone": { "type": "string" },
+        "partySize": { "type": "number" },
+        "date": { "type": "string" },
+        "timeSlot": { "type": "string" },
+        "seatingAreaId": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    },
+    "table_sessions": {
+      "fields": {
+        "tableNumber": { "type": "string" },
+        "seatingArea": { "type": "string" },
+        "status": { "type": "string", "description": "available, occupied, requested-service, billing" },
+        "activeOrderIds": { "type": "array" },
+        "serviceCall": { "type": "string", "description": "water, waiter, bill, cleanup" },
+        "openedAt": { "type": "string" }
+      }
+    }
+  }
+}

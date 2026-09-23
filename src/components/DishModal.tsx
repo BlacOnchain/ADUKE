@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Minus, Flame, Sparkles, Clock, Check } from 'lucide-react';
-import { MenuItem, CartItem } from '../types/restaurant';
+import { MenuItem, CartItem, formatNaira } from '../types/restaurant';
 
 interface DishModalProps {
   item: MenuItem | null;
@@ -206,7 +206,7 @@ export const DishModal: React.FC<DishModalProps> = ({ item, onClose, onAddToCart
                       </div>
 
                       <span className="font-mono text-[#8C8A82]">
-                        {opt.price > 0 ? `+$${opt.price.toFixed(2)}` : 'Included'}
+                        {opt.price > 0 ? `+${formatNaira(opt.price)}` : 'Included'}
                       </span>
                     </button>
                   );
@@ -259,7 +259,7 @@ export const DishModal: React.FC<DishModalProps> = ({ item, onClose, onAddToCart
           >
             <span>Add to Culinary Bag</span>
             <span className="font-mono tabular-nums text-sm font-bold">
-              ${totalPrice.toFixed(2)}
+              {formatNaira(totalPrice)}
             </span>
           </button>
         </div>
