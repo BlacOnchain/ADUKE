@@ -55,6 +55,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const navLinks = [
     { id: 'menu', label: 'Culinary Menu' },
+    { id: 'order-history', label: 'Order History' },
     { id: 'diagram', label: 'Pavilion Plan' },
     { id: 'reservation', label: 'Reservations' },
     { id: 'story', label: 'Our Story' },

@@ -35,6 +35,7 @@ import { NotificationSubscriptionModal } from './components/NotificationSubscrip
 import { Footer } from './components/Footer';
 import { CookieConsent } from './components/CookieConsent';
 import { LegalModal } from './components/LegalModal';
+import { OrderHistoryDashboard } from './components/OrderHistoryDashboard';
 
 function MainApp() {
   // DB Reactive State
@@ -174,6 +175,15 @@ function MainApp() {
     setTrackerOrder(order);
   };
 
+  const handleReorder = (order: RestaurantOrder) => {
+    const newCartItems: CartItem[] = order.items.map((i) => ({
+      ...i,
+      cartItemId: `${i.item.id}-${Date.now()}-${Math.random()}`,
+    }));
+    setCart(newCartItems);
+    setIsCartOpen(true);
+  };
+
   // Section Navigation
   const scrollToSection = (sectionId: string) => {
     setActiveSection(sectionId);
@@ -235,44 +245,56 @@ function MainApp() {
       ) : (
         /* Guest Experience View */
         <main className="flex-1">
-          {/* Hero Section */}
-          <Hero
-            onBookTable={() => scrollToSection('reservation')}
-            onExploreMenu={() => scrollToSection('menu')}
-            onExploreFloorPlan={() => scrollToSection('diagram')}
-          />
+          {activeSection === 'order-history' ? (
+            <OrderHistoryDashboard
+              orders={orders}
+              onReorder={handleReorder}
+              onTrackOrder={(order) => setTrackerOrder(order)}
+              onOpenAuth={() => setIsAuthOpen(true)}
+              onNavigateToMenu={() => scrollToSection('menu')}
+            />
+          ) : (
+            <>
+              {/* Hero Section */}
+              <Hero
+                onBookTable={() => scrollToSection('reservation')}
+                onExploreMenu={() => scrollToSection('menu')}
+                onExploreFloorPlan={() => scrollToSection('diagram')}
+              />
 
-          {/* Dynamic Categorized Culinary Menu & Live Ordering */}
-          <MenuSection
-            menu={menu}
-            onSelectDish={(dish) => setSelectedDish(dish)}
-            onQuickAdd={handleQuickAdd}
-            onOpenMenuManager={() => setIsMenuManagerOpen(true)}
-          />
+              {/* Dynamic Categorized Culinary Menu & Live Ordering */}
+              <MenuSection
+                menu={menu}
+                onSelectDish={(dish) => setSelectedDish(dish)}
+                onQuickAdd={handleQuickAdd}
+                onOpenMenuManager={() => setIsMenuManagerOpen(true)}
+              />
 
-          {/* Illustrated Cartoon Diagram & Architectural Floor Plan */}
-          <RestaurantDiagramSection
-            onSelectZoneForReservation={handleSelectZoneFromDiagram}
-          />
+              {/* Illustrated Cartoon Diagram & Architectural Floor Plan */}
+              <RestaurantDiagramSection
+                onSelectZoneForReservation={handleSelectZoneFromDiagram}
+              />
 
-          {/* Double-Booking Prevention Table Reservation System */}
-          <ReservationSection
-            seatingAreas={seatingAreas}
-            preSelectedAreaId={preSelectedZone}
-            onReservationComplete={() => {
-              // reservation completed
-            }}
-            onViewDiagram={() => scrollToSection('diagram')}
-          />
+              {/* Double-Booking Prevention Table Reservation System */}
+              <ReservationSection
+                seatingAreas={seatingAreas}
+                preSelectedAreaId={preSelectedZone}
+                onReservationComplete={() => {
+                  // reservation completed
+                }}
+                onViewDiagram={() => scrollToSection('diagram')}
+              />
 
-          {/* Google Maps Real-Time Location, Directions & Transit Agent */}
-          <GoogleMapsAgent />
+              {/* Google Maps Real-Time Location, Directions & Transit Agent */}
+              <GoogleMapsAgent />
 
-          {/* Nigerian Woodfire & Heritage Story */}
-          <StorySection />
+              {/* Nigerian Woodfire & Heritage Story */}
+              <StorySection />
 
-          {/* Guest Reviews & Ratings */}
-          <ReviewsSection reviews={reviews} />
+              {/* Guest Reviews & Ratings */}
+              <ReviewsSection reviews={reviews} />
+            </>
+          )}
         </main>
       )}
 
