@@ -7,10 +7,7 @@ import {
   Copy,
   Check,
   UserPlus,
-  Shield,
-  Key,
-  Sparkles,
-  Users
+  Key
 } from 'lucide-react';
 import {
   RestaurantOrder,
@@ -98,7 +95,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({
   };
 
   const copyInviteLink = (invite: StaffInvite) => {
-    const link = `${window.location.origin}/admin?inviteRole=${invite.role}&token=${invite.token}`;
+    const link = `${window.location.origin}/staff-onboard?role=${invite.role}&token=${invite.token}`;
     navigator.clipboard.writeText(link);
     setCopiedTokenId(invite.id);
     setTimeout(() => setCopiedTokenId(null), 2500);
@@ -221,10 +218,10 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({
               <div>
                 <h3 className="font-display text-lg font-bold text-[#121110] flex items-center gap-2">
                   <UserPlus className="w-5 h-5 text-[#14532D]" />
-                  Secure Staff Invite Links & Role Provisioning
+                  Secure Staff Onboarding Link Generator
                 </h3>
                 <p className="text-xs text-[#666] pt-1">
-                  Generate unique role-based registration links for new staff members to join their respective dashboards automatically upon sign up.
+                  Generate unique role-based onboarding links. Staff fill in their details on the registration page to automatically sync their role dashboard.
                 </p>
               </div>
               <span className="text-xs font-mono bg-[#DCFCE7] text-[#14532D] font-bold px-3 py-1.5 rounded-xl border border-emerald-300">
@@ -237,7 +234,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({
               <form onSubmit={handleGenerateInvite} className="lg:col-span-5 space-y-4 bg-[#FAFAF7] p-6 rounded-2xl border border-[#E8E6DD]">
                 <h4 className="font-bold text-xs uppercase tracking-wider text-[#121110] flex items-center gap-2">
                   <Key className="w-4 h-4 text-[#C89B3C]" />
-                  Create New Staff Invite
+                  Create Staff Onboarding Link
                 </h4>
 
                 <div className="space-y-1.5">
@@ -270,21 +267,21 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({
                   className="w-full py-3 bg-[#14532D] hover:bg-[#0D3823] text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Link className="w-4 h-4" />
-                  <span>Generate Unique Secure Link</span>
+                  <span>Generate Onboarding Link</span>
                 </button>
               </form>
 
               {/* List of Active Generated Invites */}
               <div className="lg:col-span-7 space-y-3">
                 <h4 className="font-bold text-xs uppercase tracking-wider text-[#121110] flex items-center justify-between">
-                  <span>Active Generated Invite Links ({generatedInvites.length})</span>
+                  <span>Active Onboarding Links ({generatedInvites.length})</span>
                   <span className="text-[11px] text-[#8C8A82] font-normal">Auto-Syncs with Role Permissions</span>
                 </h4>
 
                 <div className="space-y-2.5 max-h-[320px] overflow-y-auto pr-1">
                   {generatedInvites.length === 0 ? (
                     <div className="p-6 text-center bg-[#FAFAF7] border border-[#E8E6DD] rounded-2xl text-xs text-[#8C8A82]">
-                      No active invite links generated yet. Use the form on the left to create one.
+                      No active onboarding links generated yet. Use the form on the left to create one.
                     </div>
                   ) : (
                     generatedInvites.map((inv) => (
@@ -297,7 +294,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({
                             </span>
                           </div>
                           <div className="text-[11px] font-mono text-[#8C8A82] truncate max-w-xs sm:max-w-sm">
-                            {window.location.origin}/admin?inviteRole={inv.role}&token={inv.token}
+                            {window.location.origin}/staff-onboard?role={inv.role}&token={inv.token}
                           </div>
                         </div>
 

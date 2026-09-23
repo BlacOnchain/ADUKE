@@ -1,22 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   QrCode,
   Camera,
   X,
-  CheckCircle2,
   Bell,
   Receipt,
   Droplets,
   Sparkles,
-  ArrowRight,
-  RefreshCw,
-  Zap,
-  Users,
   Utensils,
-  MapPin,
-  Volume2
+  Volume2,
+  Video,
+  VideoOff
 } from 'lucide-react';
-import { TableSession, TableServiceCall, formatNaira } from '../types/restaurant';
+import { TableSession, TableServiceCall } from '../types/restaurant';
 import { restaurantDB } from '../data/db';
 import confetti from 'canvas-confetti';
 
@@ -35,7 +31,7 @@ export const ScanQR: React.FC<ScanQRProps> = ({
   onSelectTableSession,
   onOrderForTable,
 }) => {
-  const [cameraActive, setCameraActive] = useState(true);
+  const [cameraActive, setCameraActive] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [manualTableInput, setManualTableInput] = useState('');
   const [selectedTableNum, setSelectedTableNum] = useState<string>(
@@ -45,6 +41,10 @@ export const ScanQR: React.FC<ScanQRProps> = ({
     activeTableSession?.currentServiceCall || 'none'
   );
   const [callNotification, setCallNotification] = useState<string | null>(null);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
 
   // Sync state if active session exists
   useEffect(() => {
@@ -53,6 +53,39 @@ export const ScanQR: React.FC<ScanQRProps> = ({
       setActiveServiceCall(activeTableSession.currentServiceCall);
     }
   }, [activeTableSession]);
+
+  // Clean up camera stream when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      stopCamera();
+    }
+  }, [isOpen]);
+
+  const startCamera = async () => {
+    setCameraError(null);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' }
+      });
+      mediaStreamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+      setCameraActive(true);
+    } catch (err: any) {
+      console.error(err);
+      setCameraError('Unable to access device camera. Please allow camera permissions or select table below.');
+      setCameraActive(false);
+    }
+  };
+
+  const stopCamera = () => {
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach(track => track.stop());
+      mediaStreamRef.current = null;
+    }
+    setCameraActive(false);
+  };
 
   if (!isOpen) return null;
 
@@ -109,20 +142,23 @@ export const ScanQR: React.FC<ScanQRProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-display text-lg font-bold text-[#121110]">
-                  Table QR Scanner & Direct Dining Session
+                  Table QR Scanner & Device Camera Access
                 </h3>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#14532D] font-mono font-bold">
                   LIVE POS
                 </span>
               </div>
               <p className="text-xs text-[#595852]">
-                Scan your brass tabletop QR code for contactless ordering, waiter call, and digital bill review.
+                Scan your brass tabletop QR code with your device camera or select a table instantly.
               </p>
             </div>
           </div>
 
           <button
-            onClick={onClose}
+            onClick={() => {
+              stopCamera();
+              onClose();
+            }}
             className="p-2 rounded-xl text-[#8C8A82] hover:text-[#121110] hover:bg-[#F4F3ED] transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -155,6 +191,7 @@ export const ScanQR: React.FC<ScanQRProps> = ({
                     type="button"
                     onClick={() => {
                       onOrderForTable(activeTableSession.tableNumber);
+                      stopCamera();
                       onClose();
                     }}
                     className="px-3.5 py-2 bg-[#14532D] hover:bg-[#0D3823] text-white font-bold text-xs rounded-xl transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
@@ -215,28 +252,59 @@ export const ScanQR: React.FC<ScanQRProps> = ({
             </div>
           )}
 
-          {/* Interactive QR Camera Viewfinder Simulator */}
-          <div className="relative rounded-3xl bg-[#121110] text-white p-6 overflow-hidden flex flex-col items-center justify-center min-h-[220px]">
-            {/* Viewfinder corner brackets */}
-            <div className="relative w-44 h-44 rounded-2xl border-2 border-white/20 flex items-center justify-center overflow-hidden">
-              <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-[#C2410C]" />
-              <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-[#C2410C]" />
-              <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-[#C2410C]" />
-              <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-[#C2410C]" />
-
-              {/* Scanning laser line animation */}
-              <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-[#C2410C] to-transparent shadow-[0_0_12px_#C2410C] animate-pulse -translate-y-8" />
-
-              <div className="text-center space-y-1 z-10 px-2">
-                <Camera className="w-8 h-8 text-white/70 mx-auto animate-bounce" />
-                <span className="text-[11px] font-mono text-white/80 block">
-                  {scanning ? 'Decoding Table QR...' : 'Point camera at table QR'}
-                </span>
+          {/* Interactive QR Camera Viewfinder with Device Camera Access */}
+          <div className="relative rounded-3xl bg-[#121110] text-white p-6 overflow-hidden flex flex-col items-center justify-center min-h-[240px]">
+            {cameraActive ? (
+              <div className="relative w-full h-56 rounded-2xl overflow-hidden bg-black flex items-center justify-center">
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 border-2 border-emerald-500/60 pointer-events-none rounded-2xl flex items-center justify-center">
+                  <div className="w-40 h-40 border border-white/40 rounded-xl" />
+                </div>
+                <button
+                  type="button"
+                  onClick={stopCamera}
+                  className="absolute top-3 right-3 px-3 py-1.5 bg-black/70 hover:bg-black text-white text-[11px] font-bold rounded-xl flex items-center gap-1.5 backdrop-blur-md cursor-pointer border border-white/20"
+                >
+                  <VideoOff className="w-3.5 h-3.5 text-rose-400" />
+                  <span>Turn Off Camera</span>
+                </button>
               </div>
-            </div>
+            ) : (
+              <div className="relative w-full h-56 rounded-2xl border-2 border-white/20 flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-[#1C1A18] to-[#121110] p-6 text-center space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-amber-400">
+                  <Camera className="w-6 h-6 animate-bounce" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm text-white">Live Device Camera Scanner</h4>
+                  <p className="text-xs text-[#8C8A82] max-w-xs mt-1">
+                    Grant camera permission to scan physical brass tabletop QR codes directly.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={startCamera}
+                  className="px-4 py-2.5 bg-[#14532D] hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-all shadow-md flex items-center gap-2 cursor-pointer"
+                >
+                  <Video className="w-4 h-4" />
+                  <span>Enable Device Camera</span>
+                </button>
+              </div>
+            )}
+
+            {cameraError && (
+              <p className="text-xs text-rose-400 text-center mt-3 bg-rose-950/40 p-2.5 rounded-xl border border-rose-900/50">
+                {cameraError}
+              </p>
+            )}
 
             <p className="text-xs text-[#8C8A82] text-center mt-4">
-              Tap any table below to test QR code scanning instantly on your device:
+              Or tap any table below to test QR code session instantly:
             </p>
           </div>
 
@@ -318,7 +386,10 @@ export const ScanQR: React.FC<ScanQRProps> = ({
         <div className="p-4 bg-[#FAFAF7] border-t border-[#E8E6DD] flex items-center justify-between text-xs text-[#8C8A82]">
           <span>Brass Tabletop QR compatible with all modern smartphones</span>
           <button
-            onClick={onClose}
+            onClick={() => {
+              stopCamera();
+              onClose();
+            }}
             className="px-4 py-2 bg-white border border-[#E8E6DD] hover:bg-[#F4F3ED] text-[#121110] font-medium rounded-xl transition-colors cursor-pointer"
           >
             Done
