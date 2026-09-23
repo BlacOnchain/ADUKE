@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Bike, Store, Utensils, QrCode } from 'lucide-react';
+import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Bike, Store, Utensils, QrCode, User } from 'lucide-react';
 import { CartItem, OrderType, RestaurantOrder, TableSession, formatNaira } from '../types/restaurant';
 import { restaurantDB } from '../data/db';
 import { notificationService } from '../services/notificationService';
+import { useAuth } from '../context/AuthContext';
 import confetti from 'canvas-confetti';
 
 interface CartDrawerProps {
@@ -14,6 +15,7 @@ interface CartDrawerProps {
   onClearCart: () => void;
   onOrderPlaced: (order: RestaurantOrder) => void;
   activeTableSession?: TableSession | null;
+  onOpenAuth?: () => void;
 }
 
 export const CartDrawer: React.FC<CartDrawerProps> = ({
@@ -25,7 +27,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   onClearCart,
   onOrderPlaced,
   activeTableSession,
+  onOpenAuth,
 }) => {
+  const { currentUser } = useAuth();
   const [orderType, setOrderType] = useState<OrderType>(
     activeTableSession ? 'dine-in-table' : 'delivery'
   );
@@ -169,6 +173,29 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   className="px-5 py-2.5 bg-[#14532D] text-white text-xs font-semibold rounded-xl hover:bg-[#0D3823] transition-colors cursor-pointer shadow-2xs"
                 >
                   Explore Offerings
+                </button>
+              </div>
+            ) : !currentUser ? (
+              <div className="p-8 text-center space-y-5 my-auto">
+                <div className="w-14 h-14 rounded-2xl bg-[#DCFCE7] text-[#14532D] flex items-center justify-center mx-auto shadow-md">
+                  <User className="w-6 h-6" />
+                </div>
+                <div className="space-y-1.5">
+                  <h4 className="font-display text-lg font-bold text-[#121110]">Account Required to Order</h4>
+                  <p className="text-xs text-[#595852] max-w-xs mx-auto">
+                    Please sign in or create a guest account to dispatch your order and track live kitchen preparation.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    if (onOpenAuth) onOpenAuth();
+                  }}
+                  className="w-full py-3.5 bg-[#14532D] hover:bg-[#0D3823] text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>Sign In or Sign Up Now</span>
+                  <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             ) : (

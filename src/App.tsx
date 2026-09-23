@@ -269,6 +269,7 @@ function MainApp() {
         onClearCart={handleClearCart}
         onOrderPlaced={handleOrderPlaced}
         activeTableSession={activeTableSession}
+        onOpenAuth={() => setIsAuthOpen(true)}
       />
 
       <ScanQR
