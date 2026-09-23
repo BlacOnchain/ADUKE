@@ -179,20 +179,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>Book Table</span>
             </button>
 
-            {/* Staff Hierarchy Console Switch - Only visible to authenticated staff or if currently in Staff Mode */}
-            {(isStaffMode || (profile && profile.role && profile.role !== 'customer')) && (
-              <button
-                onClick={onToggleStaffMode}
-                title={isStaffMode ? 'Return to Guest Experience' : 'Open Restaurant Operations Console'}
-                className={`p-2 rounded-xl border text-xs transition-colors cursor-pointer ${
-                  isStaffMode
-                    ? 'bg-[#121110] text-white border-[#121110]'
-                    : 'bg-white text-[#595852] border-[#E8E6DD] hover:text-[#121110]'
-                }`}
-              >
-                <Shield className="w-4 h-4" />
-              </button>
-            )}
+
 
             {/* User Auth */}
             {currentUser ? (
