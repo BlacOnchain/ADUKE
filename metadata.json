@@ -1,0 +1,6 @@
+{
+  "name": "Àdùkẹ́ — Modern Nigerian Gastronomy",
+  "description": "Contemporary Nigerian dining featuring smoky woodfire jollof, suya skewers, seafood okra, online ordering, table reservations, and live tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Menu items are viewable by all, editable by authorized staff/users
+    match /menu/{itemId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Reservations
+    match /reservations/{reservationId} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if request.auth != null || true;
+    }
+
+    // Orders
+    match /orders/{orderId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+    }
+
+    // Customer Reviews
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if true;
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

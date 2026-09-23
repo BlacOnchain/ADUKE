@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  /* Brand Colors */
+  --color-brand-terracotta: #C2410C;
+  --color-brand-terracotta-dark: #9A3412;
+  --color-brand-terracotta-light: #FFEDD5;
+  
+  /* New Secondary Brand: Royal Palm Emerald (Authentic Nigerian Flora & Heritage) */
+  --color-brand-emerald: #14532D;
+  --color-brand-emerald-dark: #0D3823;
+  --color-brand-emerald-light: #DCFCE7;
+  
+  /* Antique Brass Gold Accent */
+  --color-brand-brass: #C89B3C;
+  
+  /* Canvas & Structural Tonalities */
+  --color-surface-canvas: #FAFAF7;
+  --color-surface-pure: #FFFFFF;
+  --color-surface-card: #FFFFFF;
+  --color-surface-muted: #F4F3ED;
+  --color-surface-hairline: #E8E6DD;
+  --color-ink-primary: #121110;
+  --color-ink-secondary: #595852;
+  --color-ink-muted: #8C8A82;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #FAFAF7;
+  color: #121110;
+  min-height: 100vh;
+  letter-spacing: -0.01em;
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-serif);
+  letter-spacing: -0.02em;
+}
+
+/* Subtle luxury scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #FAFAF7;
+}
+::-webkit-scrollbar-thumb {
+  background: #D8D6CC;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #14532D;
+}
