@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { Mail, Lock, AlertCircle, ArrowRight, ShieldCheck, Flame, Tablet, Receipt, TrendingUp, Utensils, Sparkles, MapPin } from 'lucide-react';
+import { Mail, Lock, AlertCircle, ArrowRight, ShieldCheck, Flame, Tablet, Receipt, TrendingUp, Sparkles, MapPin, Utensils } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,12 +12,12 @@ export const AdminLogin: React.FC = () => {
   const { signInWithEmail, logout } = useAuth();
   const navigate = useNavigate();
   
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('Odubelatomiwa508@gmail.com');
+  const [password, setPassword] = useState('BLAC: Password');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const fillDemoStaff = (roleEmail: string, pass: string = 'password123') => {
+  const fillDemoStaff = (roleEmail: string, pass: string) => {
     setEmail(roleEmail);
     setPassword(pass);
     setError(null);
@@ -37,13 +37,6 @@ export const AdminLogin: React.FC = () => {
       }
 
       await signInWithEmail(emailLower, password);
-
-      // Verify again
-      if (!isStaff) {
-        await logout();
-        throw new Error('Access Denied: You are not a registered staff member.');
-      }
-
       navigate('/admin');
     } catch (err: any) {
       console.error(err);
@@ -59,56 +52,59 @@ export const AdminLogin: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF7] text-[#121110] flex items-center justify-center p-4 sm:p-6 lg:p-12 relative overflow-hidden">
+    <div className="min-h-screen text-[#121110] flex items-center justify-center p-4 sm:p-6 lg:p-12 relative overflow-hidden">
       
-      {/* Background Ambience: Soft warm cream and subtle emerald glow */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#14532D]/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
+      {/* Background Image with Atmospheric Overlay */}
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center transform scale-105 animate-pulse duration-[10000ms]"
+        style={{ backgroundImage: `url('https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1920&q=80')` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-tr from-[#121110]/90 via-[#121110]/75 to-[#14532D]/40 z-0 backdrop-blur-[2px]" />
 
-      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
+      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
         
-        {/* Left Column: Brand Story & Gorgeous Image Panel */}
+        {/* Left Column: Animated Brand Story & Highlights */}
         <div className="lg:col-span-6 space-y-6 text-left">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#DCFCE7] border border-[#14532D]/20 text-[#14532D] rounded-full text-xs font-bold font-mono">
-            <Sparkles className="w-3.5 h-3.5 text-[#14532D]" />
-            <span>Àdùkẹ́ Gastronomy · Staff Operations</span>
+          {/* Animated Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 text-[#DCFCE7] rounded-full text-xs font-bold font-mono backdrop-blur-md animate-bounce duration-1000">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-spin" />
+            <span>Àdùkẹ́ Gastronomy · Executive Portal</span>
           </div>
 
-          <h1 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-[#121110] leading-tight">
-            Where woodfire meets <span className="italic font-normal text-[#14532D]">gastronomy</span>.
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight drop-shadow-md">
+            Where woodfire meets <span className="italic font-light text-amber-300">gastronomy</span>.
           </h1>
 
-          <p className="text-sm sm:text-base text-[#595852] leading-relaxed max-w-lg font-sans">
-            Welcome to the internal hospitality command center. Sign in to oversee live kitchen embers, table progression, guest concierge requests, and daily performance metrics.
+          <p className="text-sm sm:text-base text-[#E8E6DD] leading-relaxed max-w-lg font-sans drop-shadow">
+            Oversee live kitchen embers, table progression, guest concierge requests, and executive performance metrics in real-time.
           </p>
 
-          {/* Gorgeous Embedded Image Showcase */}
-          <div className="relative rounded-3xl overflow-hidden shadow-xl border border-[#E8E6DD] h-64 sm:h-72 group">
-            <img 
-              src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1000&q=80" 
-              alt="Àdùkẹ́ Grill Master" 
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 text-white">
-              <span className="text-xs uppercase font-mono tracking-wider text-amber-300">Victoria Island, Lagos</span>
-              <span className="font-display text-xl font-bold">Prime Cuts & Open Embers</span>
+          {/* Floating Animated Feature Pills */}
+          <div className="flex flex-wrap gap-3 pt-2">
+            <div className="px-3.5 py-2 bg-white/15 border border-white/25 rounded-xl text-xs text-white flex items-center gap-2 backdrop-blur-md animate-pulse">
+              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+              Live Table Tracking
+            </div>
+            <div className="px-3.5 py-2 bg-white/15 border border-white/25 rounded-xl text-xs text-white flex items-center gap-2 backdrop-blur-md">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+              Charcoal Grill Queue
             </div>
           </div>
 
-          <div className="flex items-center gap-6 text-xs text-[#8C8A82]">
+          <div className="flex items-center gap-6 text-xs text-[#D4D2C9] pt-4 border-t border-white/15">
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-[#14532D]" />
+              <MapPin className="w-4 h-4 text-amber-400" />
               <span>Victoria Island, Lagos</span>
             </div>
             <div className="flex items-center gap-2">
-              <Utensils className="w-4 h-4 text-[#14532D]" />
+              <Utensils className="w-4 h-4 text-amber-400" />
               <span>Open Daily 12:00 PM – 11:30 PM</span>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Clean White Luxury Staff Login Card */}
-        <div className="lg:col-span-6 bg-white border border-[#E8E6DD] rounded-[32px] p-8 sm:p-10 shadow-2xl space-y-6">
+        {/* Right Column: Clean, Static, Unanimated Luxury Staff Login Card */}
+        <div className="lg:col-span-6 bg-white/95 backdrop-blur-xl border border-white/40 rounded-[32px] p-8 sm:p-10 shadow-2xl space-y-6">
           <div className="space-y-2 text-center pb-2">
             <div className="mx-auto w-14 h-14 bg-[#14532D] text-white rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-950/20 mb-3">
               <ShieldCheck className="w-7 h-7 text-[#DCFCE7]" />
@@ -138,7 +134,7 @@ export const AdminLogin: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => fillDemoStaff('chef@aduke.com')}
+                onClick={() => fillDemoStaff('chef@aduke.com', 'password123')}
                 className="p-2.5 bg-[#FAFAF7] hover:bg-[#E8E6DD]/60 border border-[#E8E6DD] rounded-2xl text-center transition-all cursor-pointer group"
               >
                 <Flame className="w-4 h-4 text-orange-600 mx-auto mb-1 group-hover:scale-110 transition-transform" />
@@ -147,7 +143,7 @@ export const AdminLogin: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => fillDemoStaff('waiter@aduke.com')}
+                onClick={() => fillDemoStaff('waiter@aduke.com', 'password123')}
                 className="p-2.5 bg-[#FAFAF7] hover:bg-[#E8E6DD]/60 border border-[#E8E6DD] rounded-2xl text-center transition-all cursor-pointer group"
               >
                 <Tablet className="w-4 h-4 text-teal-700 mx-auto mb-1 group-hover:scale-110 transition-transform" />
@@ -156,7 +152,7 @@ export const AdminLogin: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => fillDemoStaff('cashier@aduke.com')}
+                onClick={() => fillDemoStaff('cashier@aduke.com', 'password123')}
                 className="p-2.5 bg-[#FAFAF7] hover:bg-[#E8E6DD]/60 border border-[#E8E6DD] rounded-2xl text-center transition-all cursor-pointer group"
               >
                 <Receipt className="w-4 h-4 text-amber-700 mx-auto mb-1 group-hover:scale-110 transition-transform" />
