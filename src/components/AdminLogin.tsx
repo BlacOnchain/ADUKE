@@ -54,9 +54,9 @@ export const AdminLogin: React.FC = () => {
   return (
     <div className="min-h-screen text-[#121110] flex items-center justify-center p-4 sm:p-6 lg:p-12 relative overflow-hidden">
       
-      {/* Background Image with Atmospheric Overlay */}
+      {/* Background Image (Static & Immersive, No Animation) */}
       <div 
-        className="absolute inset-0 z-0 bg-cover bg-center transform scale-105 animate-pulse duration-[10000ms]"
+        className="absolute inset-0 z-0 bg-cover bg-center"
         style={{ backgroundImage: `url('https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1920&q=80')` }}
       />
       <div className="absolute inset-0 bg-gradient-to-tr from-[#121110]/90 via-[#121110]/75 to-[#14532D]/40 z-0 backdrop-blur-[2px]" />
