@@ -207,7 +207,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 onClick={onOpenAuth}
                 className="p-2 rounded-xl bg-white border border-[#E8E6DD] text-[#595852] hover:text-[#121110] hover:bg-[#F4F3ED] transition-colors cursor-pointer"
-                title="Guest / Staff Account Login"
+                title="Restricted Staff Login"
               >
                 <User className="w-4 h-4" />
               </button>

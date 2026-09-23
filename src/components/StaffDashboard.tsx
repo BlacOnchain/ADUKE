@@ -256,49 +256,6 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({
           </div>
         </div>
 
-        {/* Role Switcher Strip */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs text-[#595852]">
-            <span className="font-bold uppercase tracking-wider text-[#121110] flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-[#14532D]" />
-              <span>Select Active Restaurant Hierarchy Level:</span>
-            </span>
-            <span className="font-mono text-[11px] text-[#8C8A82]">
-              Switch roles to evaluate customized tools
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
-            {rolesList.map((r) => {
-              const isActive = activeRole === r.id;
-              return (
-                <button
-                  key={r.id}
-                  type="button"
-                  onClick={() => handleRoleSwitch(r.id)}
-                  className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
-                    isActive
-                      ? 'border-[#14532D] bg-[#DCFCE7]/60 ring-1 ring-[#14532D] shadow-xs'
-                      : 'border-[#E8E6DD] bg-white hover:bg-[#FAFAF7]'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <div className="flex items-center gap-1.5">
-                      {r.icon}
-                      <span className="font-display text-xs font-bold text-[#121110]">
-                        {r.label}
-                      </span>
-                    </div>
-                    {isActive && <Check className="w-3.5 h-3.5 text-[#14532D] stroke-[3]" />}
-                  </div>
-                  <span className="text-[10px] font-mono font-semibold uppercase text-[#8C8A82]">
-                    {r.badge}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
 
         {/* ========================================================================= */}
         {/* ROLE 1: CEO / OWNER VIEW */}
