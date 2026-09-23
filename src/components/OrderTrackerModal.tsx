@@ -1,23 +1,19 @@
-import React, { useState, useEffect } from 'react';
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import React from 'react';
 import {
   X,
   CheckCircle2,
   Flame,
   Bike,
   PackageCheck,
-  Clock,
   MapPin,
-  ChefHat,
   Sparkles,
-  Bell,
-  BellRing,
-  Volume2,
-  Send,
-  AlertCircle
 } from 'lucide-react';
 import { RestaurantOrder, OrderStatus, formatNaira } from '../types/restaurant';
-import { restaurantDB } from '../data/db';
-import { notificationService } from '../services/notificationService';
 
 interface OrderTrackerModalProps {
   order: RestaurantOrder | null;
@@ -25,7 +21,7 @@ interface OrderTrackerModalProps {
   onStatusChange?: (orderId: string, newStatus: OrderStatus) => void;
 }
 
-export const OrderTrackerModal: React.FC<OrderTrackerModalProps> = ({ order, onClose, onStatusChange }) => {
+export const OrderTrackerModal: React.FC<OrderTrackerModalProps> = ({ order, onClose }) => {
   if (!order) return null;
 
   const stages: { status: OrderStatus; title: string; subtitle: string; icon: React.ReactNode }[] = [
@@ -63,14 +59,6 @@ export const OrderTrackerModal: React.FC<OrderTrackerModalProps> = ({ order, onC
 
   const stageOrder: OrderStatus[] = ['placed', 'confirmed', 'cooking', 'ready', 'completed'];
   const currentStageIndex = stageOrder.indexOf(order.status);
-
-  const handleAdvance = () => {
-    if (currentStageIndex < stageOrder.length - 1) {
-      const nextStatus = stageOrder[currentStageIndex + 1];
-      restaurantDB.updateOrderStatus(order.id, nextStatus);
-      if (onStatusChange) onStatusChange(order.id, nextStatus);
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm overflow-y-auto">
@@ -119,8 +107,6 @@ export const OrderTrackerModal: React.FC<OrderTrackerModalProps> = ({ order, onC
           </div>
         </div>
 
-
-
         {/* Timeline Progression */}
         <div className="p-6 sm:p-8 space-y-6">
           <div className="relative pl-6 sm:pl-8 space-y-7 before:absolute before:left-2 sm:before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-[#E8E6DD]">
@@ -167,23 +153,6 @@ export const OrderTrackerModal: React.FC<OrderTrackerModalProps> = ({ order, onC
               );
             })}
           </div>
-
-          {/* Test Simulation Controls */}
-          {order.status !== 'completed' && (
-            <div className="p-3.5 bg-[#FAFAF7] border border-[#E8E6DD] rounded-2xl flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2 text-[#595852]">
-                <ChefHat className="w-4 h-4 text-[#14532D]" />
-                <span>Simulate kitchen status transition & test notification:</span>
-              </div>
-              <button
-                type="button"
-                onClick={handleAdvance}
-                className="px-3.5 py-1.5 bg-[#14532D] hover:bg-[#0D3823] text-white font-semibold rounded-xl transition-colors shadow-2xs cursor-pointer"
-              >
-                Advance Status →
-              </button>
-            </div>
-          )}
 
           {/* Itemized Order Details */}
           <div className="pt-4 border-t border-[#E8E6DD] space-y-3">
