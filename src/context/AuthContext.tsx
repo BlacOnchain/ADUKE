@@ -72,7 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                currentUser.email?.includes('waiter') ? 'waiter' :
                currentUser.email?.includes('cashier') ? 'cashier' :
                currentUser.email?.includes('manager') ? 'manager' :
-               currentUser.email?.includes('admin') || currentUser.email?.includes('owner') ? 'owner' : 'customer') as any,
+               currentUser.email?.includes('admin') || currentUser.email?.includes('owner') || currentUser.email?.includes('odubelatomiwa') ? 'owner' : 'customer') as any,
       }
     : null;
 

@@ -30,7 +30,7 @@ export const AdminLogin: React.FC = () => {
 
     try {
       const emailLower = email.trim().toLowerCase();
-      const isStaff = ['admin', 'staff', 'owner', 'chef', 'waiter', 'cashier', 'manager'].some(role => emailLower.includes(role));
+      const isStaff = ['admin', 'staff', 'owner', 'chef', 'waiter', 'cashier', 'manager', 'odubelatomiwa'].some(role => emailLower.includes(role));
       
       if (!isStaff) {
         throw new Error('Access Denied: You are not a registered staff member.');
@@ -129,7 +129,7 @@ export const AdminLogin: React.FC = () => {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <button
                 type="button"
-                onClick={() => fillDemoStaff('owner@aduke.com')}
+                onClick={() => fillDemoStaff('Odubelatomiwa508@gmail.com', 'BLAC: Password')}
                 className="p-2.5 bg-[#FAFAF7] hover:bg-[#E8E6DD]/60 border border-[#E8E6DD] rounded-2xl text-center transition-all cursor-pointer group"
               >
                 <TrendingUp className="w-4 h-4 text-[#14532D] mx-auto mb-1 group-hover:scale-110 transition-transform" />
