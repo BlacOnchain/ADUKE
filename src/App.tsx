@@ -364,9 +364,13 @@ function RedirectHandler() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const p = params.get('p');
+    const role = params.get('role') || params.get('inviteRole');
+    
     if (p) {
       window.history.replaceState({}, '', window.location.pathname + p + window.location.hash);
       navigate(p, { replace: true });
+    } else if (role && window.location.pathname === '/') {
+      navigate(`/staff-onboard${window.location.search}`, { replace: true });
     }
   }, [navigate]);
   return null;

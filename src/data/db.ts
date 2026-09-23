@@ -19,6 +19,7 @@ import {
   TableServiceCall,
   TableStatus,
   PaymentMethod,
+  StaffRole,
 } from '../types/restaurant';
 import { INITIAL_NIGERIAN_MENU, NIGERIAN_SEATING_AREAS } from './menuData';
 
@@ -595,6 +596,45 @@ export const restaurantDB = {
     }
 
     emitChange();
+  },
+
+  settleOrderPayment(id: string, paymentMethod: PaymentMethod): void {
+    const list = this.getOrders();
+    const updated = list.map((o) => (o.id === id ? { ...o, paymentStatus: 'paid' as const, paymentMethod } : o));
+    localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(updated));
+    try {
+      updateDoc(doc(db, 'orders', id), { paymentStatus: 'paid', paymentMethod }).catch(() => {});
+    } catch {}
+    emitChange();
+  },
+
+  // STAFF & ACCOUNT MANAGEMENT
+  getRegisteredStaff(): any[] {
+    try {
+      const data = localStorage.getItem('aduke_registered_staff_list');
+      if (data) return JSON.parse(data);
+    } catch {}
+    const defaultStaff = [
+      { id: 'stf-1', fullName: 'Chief Executive Officer', email: 'Odubelatomiwa508@gmail.com', role: 'owner', phone: '+234 803 000 0001', staffPin: '0000', registeredAt: '2026-09-01' },
+      { id: 'stf-2', fullName: 'Chef Tunde Adebayo', email: 'chef@aduke.com', role: 'chef', phone: '+234 802 111 2233', staffPin: '1122', registeredAt: '2026-09-10' },
+      { id: 'stf-3', fullName: 'Sarah Okafor', email: 'waiter@aduke.com', role: 'waiter', phone: '+234 805 333 4455', staffPin: '3344', registeredAt: '2026-09-12' },
+      { id: 'stf-4', fullName: 'Nkechi Eze', email: 'cashier@aduke.com', role: 'cashier', phone: '+234 807 555 6677', staffPin: '5566', registeredAt: '2026-09-15' },
+    ];
+    localStorage.setItem('aduke_registered_staff_list', JSON.stringify(defaultStaff));
+    return defaultStaff;
+  },
+
+  registerStaffMember(staffData: { fullName: string; email: string; role: StaffRole; phone: string; staffPin: string }): any {
+    const staffList = this.getRegisteredStaff();
+    const newStaff = {
+      id: 'stf-' + Date.now(),
+      ...staffData,
+      registeredAt: new Date().toISOString().split('T')[0],
+    };
+    const updated = [newStaff, ...staffList];
+    localStorage.setItem('aduke_registered_staff_list', JSON.stringify(updated));
+    emitChange();
+    return newStaff;
   },
 
   // REVIEWS

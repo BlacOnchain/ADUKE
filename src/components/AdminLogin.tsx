@@ -245,11 +245,20 @@ export const AdminLogin: React.FC = () => {
             </button>
           </form>
 
-          <div className="pt-2 text-center border-t border-[#E8E6DD]">
+          <div className="pt-2 text-center border-t border-[#E8E6DD] space-y-2">
+            <button
+              type="button"
+              onClick={() => navigate(`/staff-onboard${inviteRole ? `?role=${inviteRole}` : ''}`)}
+              className="w-full py-2.5 bg-[#DCFCE7] hover:bg-emerald-200 text-[#14532D] font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer border border-emerald-300"
+            >
+              <UserCheck className="w-4 h-4" />
+              <span>Received an Invite Link? Register Account Here →</span>
+            </button>
+
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="text-xs font-semibold text-[#8C8A82] hover:text-[#121110] transition-colors cursor-pointer"
+              className="text-xs font-semibold text-[#8C8A82] hover:text-[#121110] transition-colors cursor-pointer block mx-auto"
             >
               ← Return to Àdùkẹ́ Public Dining Experience
             </button>

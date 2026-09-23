@@ -8,6 +8,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Phone, Key, ArrowRight, Sparkles, ShieldCheck, Flame, Tablet, Receipt, TrendingUp, ChefHat } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { StaffRole } from '../types/restaurant';
+import { restaurantDB } from '../data/db';
 
 export const StaffOnboarding: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -48,7 +49,16 @@ export const StaffOnboarding: React.FC = () => {
     setLoading(true);
 
     try {
-      // Simulate account registration & auth sync
+      // Register in Database
+      restaurantDB.registerStaffMember({
+        fullName: fullName.trim() || currentRoleInfo.title,
+        email: email.trim().toLowerCase(),
+        role: roleParam,
+        phone,
+        staffPin
+      });
+
+      // Save active session & sync auth
       localStorage.setItem('aduke_staff_session', JSON.stringify({
         uid: 'staff-' + Date.now(),
         email: email.trim().toLowerCase(),
@@ -204,7 +214,7 @@ export const StaffOnboarding: React.FC = () => {
         <div className="text-center pt-2 border-t border-[#E8E6DD]">
           <button
             type="button"
-            onClick={() => navigate('/admin-login')}
+            onClick={() => navigate('/admin')}
             className="text-xs font-semibold text-[#8C8A82] hover:text-[#121110] transition-colors cursor-pointer"
           >
             Already have a staff account? Sign In Here
