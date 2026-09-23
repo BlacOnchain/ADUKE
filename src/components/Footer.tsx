@@ -1,5 +1,6 @@
 import React from 'react';
-import { MapPin, Phone, Mail, Clock, ArrowUpRight, ShieldCheck } from 'lucide-react';
+import { MapPin, Phone, Clock, ShieldCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface FooterProps {
   onNavigate: (section: string) => void;
@@ -8,6 +9,8 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenLegal }) => {
+  const navigate = useNavigate();
+
   return (
     <footer className="bg-[#FAFAF7] text-[#121110] border-t border-[#E8E6DD] pt-20 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -131,6 +134,14 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenL
               className="hover:text-[#121110] transition-colors cursor-pointer"
             >
               Directions
+            </button>
+            {/* Discrete staff entry — not labelled prominently */}
+            <button
+              onClick={() => navigate('/admin')}
+              className="text-[#D4D2CC] hover:text-[#8C8A82] transition-colors cursor-pointer text-[10px]"
+              title="Staff Operations Portal"
+            >
+              Staff
             </button>
           </div>
         </div>

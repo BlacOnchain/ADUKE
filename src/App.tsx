@@ -35,7 +35,19 @@ import { CookieConsent } from './components/CookieConsent';
 import { LegalModal } from './components/LegalModal';
 import { OrderHistoryDashboard } from './components/OrderHistoryDashboard';
 
-function MainApp() {
+import { BrowserRouter, useNavigate, useLocation } from 'react-router-dom';
+import { AdminLogin } from './components/AdminLogin';
+import { useAuth } from './context/AuthContext';
+
+
+function MainContent() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
+  const { profile } = useAuth();
+  const isStaffLoggedIn = profile && profile.role !== 'customer';
+
   // DB Reactive State
   const [menu, setMenu] = useState<MenuItem[]>(() => restaurantDB.getMenu());
   const [seatingAreas] = useState(() => restaurantDB.getSeatingAreas());
@@ -45,9 +57,6 @@ function MainApp() {
 
   // Navigation & View state
   const [activeSection, setActiveSection] = useState<string>('hero');
-  const [isStaffMode, setIsStaffMode] = useState<boolean>(false);
-  const [staffRole, setStaffRole] = useState<StaffRole>('owner');
-
 
   // Table QR Session State
   const [isScanQROpen, setIsScanQROpen] = useState(false);
@@ -182,7 +191,6 @@ function MainApp() {
     setIsCartOpen(true);
   };
 
-  // Section Navigation
   const scrollToSection = (sectionId: string) => {
     setActiveSection(sectionId);
     if (sectionId === 'hero') {
@@ -195,12 +203,36 @@ function MainApp() {
     }
   };
 
-
   const handleOpenLegal = (tab: 'privacy' | 'terms') => {
     setLegalTab(tab);
     setIsLegalOpen(true);
   };
 
+  // If we are on the admin route, render the Staff Portal or Login completely separate
+  if (isAdminRoute) {
+    if (!isStaffLoggedIn) {
+      return <AdminLogin />;
+    }
+    return (
+      <>
+        <StaffDashboard
+          orders={orders}
+          reservations={reservations}
+          menu={menu}
+          currentRole={profile.role as StaffRole}
+          onClose={() => navigate('/')}
+          onOpenMenuManager={() => setIsMenuManagerOpen(true)}
+        />
+        <MenuManagementModal
+          isOpen={isMenuManagerOpen}
+          onClose={() => setIsMenuManagerOpen(false)}
+          menu={menu}
+        />
+      </>
+    );
+  }
+
+  // Otherwise, render the Guest Public Interface
   return (
     <div className="min-h-screen bg-[#FAFAF7] text-[#121110] flex flex-col selection:bg-[#14532D] selection:text-white">
       
@@ -217,80 +249,52 @@ function MainApp() {
         activeTableSession={activeTableSession}
         activeOrder={activeOrder}
         onOpenTracker={() => setTrackerOrder(activeOrder || orders[0] || null)}
-        isStaffMode={isStaffMode}
-        onToggleStaffMode={() => setIsStaffMode((prev) => !prev)}
+        isStaffMode={false} // Removed
+        onToggleStaffMode={() => {}} // Removed
         onOpenAuth={() => setIsAuthOpen(true)}
-        onOpenMenuManager={() => setIsMenuManagerOpen(true)}
+        onOpenMenuManager={() => {}}
       />
 
-      {isStaffMode ? (
-        /* Kitchen / Staff Management Screen with 5-tier Hierarchy Console */
-        <main className="flex-1">
-          <StaffDashboard
+      <main className="flex-1">
+        {activeSection === 'order-history' ? (
+          <OrderHistoryDashboard
             orders={orders}
-            reservations={reservations}
-            menu={menu}
-            currentRole={staffRole}
-            onRoleChange={(role) => setStaffRole(role)}
-            onClose={() => setIsStaffMode(false)}
-            onOpenMenuManager={() => setIsMenuManagerOpen(true)}
+            onReorder={handleReorder}
+            onTrackOrder={(order) => setTrackerOrder(order)}
+            onOpenAuth={() => setIsAuthOpen(true)}
+            onNavigateToMenu={() => scrollToSection('menu')}
           />
-        </main>
-      ) : (
-        /* Guest Experience View */
-        <main className="flex-1">
-          {activeSection === 'order-history' ? (
-            <OrderHistoryDashboard
-              orders={orders}
-              onReorder={handleReorder}
-              onTrackOrder={(order) => setTrackerOrder(order)}
-              onOpenAuth={() => setIsAuthOpen(true)}
-              onNavigateToMenu={() => scrollToSection('menu')}
+        ) : (
+          <>
+            <Hero
+              onBookTable={() => scrollToSection('reservation')}
+              onExploreMenu={() => scrollToSection('menu')}
             />
-          ) : (
-            <>
-              {/* Hero Section */}
-              <Hero
-                onBookTable={() => scrollToSection('reservation')}
-                onExploreMenu={() => scrollToSection('menu')}
-              />
 
-              {/* Dynamic Categorized Culinary Menu & Live Ordering */}
-              <MenuSection
-                menu={menu}
-                onSelectDish={(dish) => setSelectedDish(dish)}
-                onQuickAdd={handleQuickAdd}
-                onOpenMenuManager={() => setIsMenuManagerOpen(true)}
-              />
+            <MenuSection
+              menu={menu}
+              onSelectDish={(dish) => setSelectedDish(dish)}
+              onQuickAdd={handleQuickAdd}
+              onOpenMenuManager={() => {}}
+            />
 
-              {/* Double-Booking Prevention Table Reservation System */}
-              <ReservationSection
-                seatingAreas={seatingAreas}
-                onReservationComplete={() => {
-                  // reservation completed
-                }}
-              />
+            <ReservationSection
+              seatingAreas={seatingAreas}
+              onReservationComplete={() => {}}
+            />
 
-              {/* Nigerian Woodfire & Heritage Story */}
-              <StorySection />
+            <StorySection />
+            <ReviewsSection reviews={reviews} />
+          </>
+        )}
+      </main>
 
-              {/* Guest Reviews & Ratings */}
-              <ReviewsSection reviews={reviews} />
-            </>
-          )}
-        </main>
-      )}
+      <Footer
+        onNavigate={scrollToSection}
+        onBookTable={() => scrollToSection('reservation')}
+        onOpenLegal={handleOpenLegal}
+      />
 
-      {/* Footer */}
-      {!isStaffMode && (
-        <Footer
-          onNavigate={scrollToSection}
-          onBookTable={() => scrollToSection('reservation')}
-          onOpenLegal={handleOpenLegal}
-        />
-      )}
-
-      {/* Cart & Checkout Slide-Over */}
       <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
@@ -302,7 +306,6 @@ function MainApp() {
         activeTableSession={activeTableSession}
       />
 
-      {/* Table QR Scanning & Direct Table Ordering Simulator */}
       <ScanQR
         isOpen={isScanQROpen}
         onClose={() => setIsScanQROpen(false)}
@@ -316,14 +319,12 @@ function MainApp() {
         }}
       />
 
-      {/* Dish Customization Modal */}
       <DishModal
         item={selectedDish}
         onClose={() => setSelectedDish(null)}
         onAddToCart={handleAddToCart}
       />
 
-      {/* Live Order Tracker Modal */}
       <OrderTrackerModal
         order={trackerOrder}
         onClose={() => setTrackerOrder(null)}
@@ -334,41 +335,24 @@ function MainApp() {
         }}
       />
 
-      {/* User Authentication Modal with Guest & Staff Hierarchy Portals */}
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
-        onStaffLoginSuccess={(role) => {
-          setStaffRole(role);
-          setIsStaffMode(true);
-        }}
       />
 
-      {/* Dynamic Menu & Price Management Modal (Staff / Admin Tool) */}
-      <MenuManagementModal
-        isOpen={isMenuManagerOpen}
-        onClose={() => setIsMenuManagerOpen(false)}
-        menu={menu}
-      />
-
-      {/* Privacy Policy & Terms of Service Modal */}
       <LegalModal
         isOpen={isLegalOpen}
         onClose={() => setIsLegalOpen(false)}
         initialTab={legalTab}
       />
 
-      {/* Real-time Order Notification Subscription Service Modal */}
       <NotificationSubscriptionModal
         isOpen={isNotificationModalOpen}
         onClose={() => setIsNotificationModalOpen(false)}
         activeOrderNumber={activeOrder?.orderNumber}
       />
 
-      {/* Real-time In-App Order Status Toast Banner */}
       <NotificationToast />
-
-      {/* Discrete Cookie Preferences Banner */}
       <CookieConsent />
 
     </div>
@@ -377,8 +361,10 @@ function MainApp() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <MainApp />
-    </AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <MainContent />
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
