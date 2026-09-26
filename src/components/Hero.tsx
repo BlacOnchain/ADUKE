@@ -2,10 +2,9 @@ import React from 'react';
 import {
   ArrowRight,
   Utensils,
-  Sparkles,
   MapPin,
   Clock,
-  Heart,
+  Flame,
 } from 'lucide-react';
 import heroImg from '../assets/images/hero_nigerian_restaurant_1790149661135.jpg';
 import jollofImg from '../assets/images/nigerian_jollof_deluxe_1790149678289.jpg';
@@ -31,9 +30,10 @@ export const Hero: React.FC<HeroProps> = ({
           {/* Left Column: Welcoming Human Narrative */}
           <div className="lg:col-span-6 space-y-5 text-left">
             
+            {/* Clean, authentic restaurant badge — No AI sparkle logo */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#DCFCE7] text-[#14532D] text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5 text-[#C89B3C]" />
-              <span>Welcome to Àdùkẹ́ · Victoria Island, Lagos</span>
+              <span className="w-2 h-2 rounded-full bg-[#14532D] animate-pulse" />
+              <span>Victoria Island, Lagos · Open Hearth Dining</span>
             </div>
 
             <h1 
@@ -83,7 +83,7 @@ export const Hero: React.FC<HeroProps> = ({
 
           </div>
 
-          {/* Right Column: Clean, Elegant Single Visual Showcase (No Clutter / No Multi-Boxes) */}
+          {/* Right Column: Clean, Elegant Single Visual Showcase */}
           <div className="lg:col-span-6 animate-fade-scale">
             <TiltCard maxTilt={4} scale={1.01} className="rounded-3xl">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-[#E8E6DD] bg-[#121110]">

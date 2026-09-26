@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flame, Sparkles, Heart, Wine } from 'lucide-react';
+import { Flame, Heart, Wine } from 'lucide-react';
 import jollofImg from '../assets/images/nigerian_jollof_deluxe_1790149678289.jpg';
 import suyaImg from '../assets/images/nigerian_suya_prawns_1790149701081.jpg';
 import { TiltCard } from './TiltCard';

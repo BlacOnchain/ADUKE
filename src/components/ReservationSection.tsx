@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Calendar, Clock, Users, CheckCircle2, AlertCircle, ArrowRight, ShieldCheck, Sparkles, MapPin } from 'lucide-react';
+import { Calendar, Clock, Users, CheckCircle2, AlertCircle, ArrowRight, ShieldCheck, MapPin } from 'lucide-react';
 import { SeatingArea, TableReservation } from '../types/restaurant';
 import { restaurantDB } from '../data/db';
 import confetti from 'canvas-confetti';
@@ -134,7 +134,7 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
         {/* Section Header */}
         <div className="max-w-2xl mx-auto text-center space-y-3 mb-12">
           <div className="inline-flex items-center gap-2 text-xs font-bold tracking-wider uppercase text-[#14532D]">
-            <Sparkles className="w-3.5 h-3.5 text-[#C89B3C]" />
+            <span className="w-2 h-2 rounded-full bg-[#14532D]" />
             <span>Table Reservations</span>
           </div>
           <h2 

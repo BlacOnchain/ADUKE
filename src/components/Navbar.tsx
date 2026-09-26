@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Utensils, User, LogOut, Menu, X, QrCode, Sparkles, Bell, Phone, Mail, Shield } from 'lucide-react';
+import { ShoppingBag, Utensils, User, LogOut, Menu, X, QrCode, Bell, Phone, Mail, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { RestaurantOrder, TableSession, formatNaira } from '../types/restaurant';

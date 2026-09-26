@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Utensils, ArrowLeft, Home, Compass, Phone, Sparkles } from 'lucide-react';
+import { Utensils, ArrowLeft, Home, Compass, Phone } from 'lucide-react';
 
 export const NotFound: React.FC = () => {
   const navigate = useNavigate();
@@ -39,7 +39,7 @@ export const NotFound: React.FC = () => {
           
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#DCFCE7] text-[#14532D] text-xs font-mono font-bold tracking-wider uppercase">
-              <Sparkles className="w-3.5 h-3.5 text-[#C89B3C]" />
+              <span className="w-2 h-2 rounded-full bg-[#14532D]" />
               <span>Table Unoccupied · 404</span>
             </div>
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, MessageSquarePlus, CheckCircle2, X, AlertCircle, Sparkles } from 'lucide-react';
+import { Star, MessageSquarePlus, CheckCircle2, X, AlertCircle } from 'lucide-react';
 import { CustomerReview } from '../types/restaurant';
 import { restaurantDB } from '../data/db';
 

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Search, Plus, Sparkles, SlidersHorizontal } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Search, Plus, SlidersHorizontal, Check } from 'lucide-react';
 import { MenuItem, MenuCategory, NigerianDietBadge, formatNaira } from '../types/restaurant';
 import { TiltCard } from './TiltCard';
 
@@ -36,27 +36,39 @@ export const MenuSection: React.FC<MenuSectionProps> = ({
     { id: 'vegetarian', label: 'Vegetarian' },
   ];
 
-  // Filter items
-  const filteredItems = menu.filter((item) => {
-    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
-    const matchesSearch =
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (item.yorubaName && item.yorubaName.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesTag = selectedTag === 'all' || item.tags?.includes(selectedTag as NigerianDietBadge);
+  // Count items per category
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: menu.length };
+    menu.forEach((item) => {
+      counts[item.category] = (counts[item.category] || 0) + 1;
+    });
+    return counts;
+  }, [menu]);
 
-    return matchesCategory && matchesSearch && matchesTag;
-  });
+  // Filter items
+  const filteredItems = useMemo(() => {
+    return menu.filter((item) => {
+      const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
+      const matchesSearch =
+        searchQuery.trim() === '' ||
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (item.yorubaName && item.yorubaName.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesTag = selectedTag === 'all' || item.tags?.includes(selectedTag as NigerianDietBadge);
+
+      return matchesCategory && matchesSearch && matchesTag;
+    });
+  }, [menu, selectedCategory, searchQuery, selectedTag]);
 
   return (
     <section id="menu-section" className="py-14 sm:py-24 bg-[#FAFAF7] text-[#121110] border-t border-[#E8E6DD]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Clean, Human Section Header */}
+        {/* Clean, Human Section Header without any AI sparkle icons */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-8 sm:pb-12 border-b border-[#E8E6DD]">
           <div className="max-w-2xl space-y-2 text-left">
             <div className="inline-flex items-center gap-2 text-xs font-bold tracking-wider uppercase text-[#14532D]">
-              <Sparkles className="w-3.5 h-3.5 text-[#C89B3C]" />
+              <span className="w-2 h-2 rounded-full bg-[#14532D]" />
               <span>Freshly Prepared Daily</span>
             </div>
             <h2 
@@ -72,23 +84,36 @@ export const MenuSection: React.FC<MenuSectionProps> = ({
         </div>
 
         {/* Category Navigation & Search Filter Controls */}
-        <div className="pt-6 pb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4">
+        <div className="pt-6 pb-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4">
           
-          {/* Category Filter Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 w-full md:w-auto scrollbar-none">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`px-3 sm:px-4 py-2 text-xs font-semibold rounded-xl whitespace-nowrap transition-all cursor-pointer ${
-                  selectedCategory === cat.id
-                    ? 'bg-[#14532D] text-white shadow-xs'
-                    : 'bg-white hover:bg-[#F4F3ED] text-[#595852] border border-[#E8E6DD]'
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
+          {/* Category Filter Tabs with count badges */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto scrollbar-none">
+            {categories.map((cat) => {
+              const count = categoryCounts[cat.id] || 0;
+              const isSelected = selectedCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`px-3.5 sm:px-4 py-2.5 text-xs font-semibold rounded-xl whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
+                    isSelected
+                      ? 'bg-[#14532D] text-white shadow-sm shadow-emerald-950/20 ring-1 ring-[#14532D]'
+                      : 'bg-white hover:bg-[#F4F3ED] text-[#595852] hover:text-[#121110] border border-[#E8E6DD]'
+                  }`}
+                >
+                  <span>{cat.label}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-medium ${
+                      isSelected
+                        ? 'bg-white/20 text-white'
+                        : 'bg-[#FAFAF7] text-[#8C8A82]'
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Search Box */}
@@ -99,7 +124,7 @@ export const MenuSection: React.FC<MenuSectionProps> = ({
               placeholder="Search jollof, suya, swallow..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-xs bg-white border border-[#E8E6DD] rounded-xl text-[#121110] placeholder-[#8C8A82] focus:outline-none focus:border-[#14532D] focus:ring-1 focus:ring-[#14532D] transition-all"
+              className="w-full pl-9 pr-4 py-2.5 text-xs bg-white border border-[#E8E6DD] rounded-xl text-[#121110] placeholder-[#8C8A82] focus:outline-none focus:border-[#14532D] focus:ring-1 focus:ring-[#14532D] transition-all shadow-2xs"
             />
           </div>
 
@@ -108,19 +133,20 @@ export const MenuSection: React.FC<MenuSectionProps> = ({
         {/* Dietary Filter Strip */}
         <div className="flex items-center gap-1.5 pb-6 overflow-x-auto text-xs text-[#595852] scrollbar-none">
           <span className="font-semibold text-[#121110] text-[11px] sm:text-xs mr-1 shrink-0">
-            Filter by:
+            Dietary:
           </span>
           {dietaryTags.map((t) => (
             <button
               key={t.id}
               onClick={() => setSelectedTag(t.id)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1 ${
                 selectedTag === t.id
-                  ? 'bg-[#DCFCE7] text-[#14532D] font-bold'
-                  : 'bg-white/80 hover:bg-white text-[#595852] border border-[#E8E6DD]'
+                  ? 'bg-[#DCFCE7] text-[#14532D] font-bold ring-1 ring-[#14532D]/30'
+                  : 'bg-white hover:bg-[#F4F3ED] text-[#595852] border border-[#E8E6DD]'
               }`}
             >
-              {t.label}
+              {selectedTag === t.id && <Check className="w-3 h-3 text-[#14532D]" />}
+              <span>{t.label}</span>
             </button>
           ))}
         </div>
@@ -144,7 +170,7 @@ export const MenuSection: React.FC<MenuSectionProps> = ({
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 text-left">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6 text-left">
             {filteredItems.map((dish, idx) => (
               <TiltCard
                 key={dish.id}
@@ -153,7 +179,7 @@ export const MenuSection: React.FC<MenuSectionProps> = ({
                 className="animate-fade-scale rounded-2xl sm:rounded-3xl h-full"
               >
                 <article
-                  style={{ animationDelay: `${Math.min(idx * 40, 300)}ms` }}
+                  style={{ animationDelay: `${Math.min(idx * 35, 300)}ms` }}
                   className="group relative bg-white rounded-2xl sm:rounded-3xl border border-[#E8E6DD] overflow-hidden hover:shadow-lg hover:border-[#14532D]/30 transition-all duration-300 flex flex-col justify-between h-full"
                 >
                   <div>
@@ -181,18 +207,18 @@ export const MenuSection: React.FC<MenuSectionProps> = ({
                     </div>
 
                     {/* Card Content */}
-                    <div className="p-3 sm:p-5 space-y-1.5 sm:space-y-2">
+                    <div className="p-3.5 sm:p-5 space-y-1.5 sm:space-y-2">
                       
                       {/* Simple Category & Prep Time */}
                       <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-medium text-[#8C8A82]">
-                        <span className="text-[#14532D] font-bold uppercase">
+                        <span className="text-[#14532D] font-bold uppercase tracking-wider">
                           {dish.category}
                         </span>
                         <span>·</span>
                         <span>{dish.prepTimeMinutes} mins</span>
                       </div>
 
-                      {/* Dish Title */}
+                      {/* Dish Title & Yoruba Name with proper food fonts */}
                       <div 
                         onClick={() => onSelectDish(dish)}
                         className="cursor-pointer space-y-0.5"
@@ -201,7 +227,7 @@ export const MenuSection: React.FC<MenuSectionProps> = ({
                           {dish.name}
                         </h3>
                         {dish.yorubaName && (
-                          <p className="font-serif italic text-[11px] sm:text-xs text-[#C2410C] truncate">
+                          <p className="font-serif italic text-[11px] sm:text-xs text-[#C2410C] truncate font-medium">
                             {dish.yorubaName}
                           </p>
                         )}
@@ -216,7 +242,7 @@ export const MenuSection: React.FC<MenuSectionProps> = ({
                   </div>
 
                   {/* Price & Add Action */}
-                  <div className="p-3 sm:p-5 pt-1 sm:pt-2 border-t border-[#F4F3ED] flex items-center justify-between gap-2">
+                  <div className="p-3.5 sm:p-5 pt-1.5 sm:pt-2 border-t border-[#F4F3ED] flex items-center justify-between gap-2">
                     <div>
                       <span className="font-mono text-xs sm:text-base font-bold text-[#121110] tabular-nums">
                         {formatNaira(dish.price)}
@@ -236,7 +262,7 @@ export const MenuSection: React.FC<MenuSectionProps> = ({
                         type="button"
                         disabled={!dish.available}
                         onClick={() => onQuickAdd(dish)}
-                        className="btn-interactive px-3 py-1.5 sm:px-4 sm:py-2 bg-[#14532D] hover:bg-[#0D3823] disabled:opacity-40 text-white text-[11px] sm:text-xs font-semibold rounded-lg sm:rounded-xl shadow-xs flex items-center gap-1 cursor-pointer"
+                        className="btn-interactive px-3 py-2 sm:px-4 sm:py-2 bg-[#14532D] hover:bg-[#0D3823] disabled:opacity-40 text-white text-[11px] sm:text-xs font-semibold rounded-lg sm:rounded-xl shadow-xs flex items-center gap-1 cursor-pointer min-h-[36px] sm:min-h-[38px]"
                         title="Add to order bag"
                       >
                         <Plus className="w-3.5 h-3.5" />
