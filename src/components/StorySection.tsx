@@ -2,6 +2,7 @@ import React from 'react';
 import { Flame, Sparkles, Sprout, Wine } from 'lucide-react';
 import jollofImg from '../assets/images/nigerian_jollof_deluxe_1790149678289.jpg';
 import suyaImg from '../assets/images/nigerian_suya_prawns_1790149701081.jpg';
+import { TiltCard } from './TiltCard';
 
 export const StorySection: React.FC = () => {
   return (
@@ -63,7 +64,7 @@ export const StorySection: React.FC = () => {
 
           {/* Right Imagery Column — Hand-Crafted Editorial Presentation */}
           <div className="lg:col-span-6 grid grid-cols-2 gap-5">
-            <div className="space-y-5">
+            <TiltCard maxTilt={5} scale={1.01} className="space-y-5 rounded-3xl">
               <div className="aspect-[4/5] rounded-3xl overflow-hidden bg-[#F4F3ED] border border-[#E8E6DD] shadow-xs">
                 <img
                   src={jollofImg}
@@ -81,9 +82,9 @@ export const StorySection: React.FC = () => {
                   Steamed in heavy cast-iron cauldrons over white oak to achieve the cherished caramelized bottom-pot crunch.
                 </p>
               </div>
-            </div>
+            </TiltCard>
 
-            <div className="space-y-5 pt-8 sm:pt-12">
+            <TiltCard maxTilt={5} scale={1.01} className="space-y-5 pt-8 sm:pt-12 rounded-3xl">
               <div className="p-5 rounded-2xl bg-white border border-[#E8E6DD] text-xs space-y-1.5 text-left shadow-2xs">
                 <p className="font-bold text-[#121110] flex items-center gap-1.5">
                   <Wine className="w-3.5 h-3.5 text-[#14532D]" />
@@ -101,7 +102,7 @@ export const StorySection: React.FC = () => {
                   className="w-full h-full object-cover hover:scale-104 transition-transform duration-700"
                 />
               </div>
-            </div>
+            </TiltCard>
           </div>
 
         </div>

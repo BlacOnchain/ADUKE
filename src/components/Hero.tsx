@@ -16,6 +16,7 @@ import {
 import heroImg from '../assets/images/hero_nigerian_restaurant_1790149661135.jpg';
 import jollofImg from '../assets/images/nigerian_jollof_deluxe_1790149678289.jpg';
 import suyaImg from '../assets/images/nigerian_suya_prawns_1790149701081.jpg';
+import { TiltCard } from './TiltCard';
 
 interface HeroProps {
   onBookTable: () => void;
@@ -215,7 +216,7 @@ export const Hero: React.FC<HeroProps> = ({
             <div className="pt-2 flex flex-wrap items-center gap-3.5">
               <button
                 onClick={onBookTable}
-                className="px-6 py-3.5 bg-[#14532D] hover:bg-[#0D3823] text-white text-xs font-semibold uppercase tracking-wider rounded-xl transition-all shadow-md shadow-emerald-950/15 flex items-center gap-2.5 cursor-pointer"
+                className="btn-interactive px-6 py-3.5 bg-[#14532D] hover:bg-[#0D3823] text-white text-xs font-semibold uppercase tracking-wider rounded-xl shadow-md shadow-emerald-950/15 flex items-center gap-2.5 cursor-pointer"
               >
                 <Utensils className="w-4 h-4" />
                 <span>Reserve a Table</span>
@@ -223,7 +224,7 @@ export const Hero: React.FC<HeroProps> = ({
 
               <button
                 onClick={onExploreMenu}
-                className="px-5 py-3.5 bg-white hover:bg-[#F4F3ED] text-[#121110] text-xs font-semibold uppercase tracking-wider rounded-xl border border-[#E8E6DD] transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
+                className="btn-interactive px-5 py-3.5 bg-white hover:bg-[#F4F3ED] text-[#121110] text-xs font-semibold uppercase tracking-wider rounded-xl border border-[#E8E6DD] flex items-center gap-2 cursor-pointer shadow-2xs"
               >
                 <span>Explore Culinary Menu</span>
                 <ArrowRight className="w-3.5 h-3.5 text-[#14532D]" />
@@ -234,7 +235,7 @@ export const Hero: React.FC<HeroProps> = ({
             {/* Quiet Hallmark Metrics Strip — Unboxed & Refined */}
             <div className="pt-3 border-t border-[#E8E6DD] flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#595852] font-mono">
               <span className="flex items-center gap-1.5">
-                <Flame className="w-3.5 h-3.5 text-[#C2410C]" />
+                <Flame className="w-3.5 h-3.5 text-[#C2410C] animate-pulse" />
                 <strong className="text-[#121110] font-sans font-bold">420°C</strong> Iron Cauldrons
               </span>
               <span aria-hidden="true" className="text-[#8C8A82]">·</span>
@@ -248,9 +249,10 @@ export const Hero: React.FC<HeroProps> = ({
 
           </div>
 
-          {/* Right Column: Animated, Interactive Live Hearth & Gastronomy Showcase */}
-          <div className="lg:col-span-6">
-            <div className="relative bg-white border border-[#E8E6DD] rounded-3xl p-4 sm:p-5 shadow-[0_20px_50px_rgba(18,17,16,0.08)] transition-all">
+          {/* Right Column: Animated, Interactive Live Hearth 3D Tilt Showcase */}
+          <div className="lg:col-span-6 animate-fade-scale">
+            <TiltCard maxTilt={5} scale={1.01} className="rounded-3xl">
+              <div className="relative bg-white border border-[#E8E6DD] rounded-3xl p-4 sm:p-5 shadow-[0_20px_50px_rgba(18,17,16,0.08)] transition-all">
               
               {/* Interactive Showcase Tabs (Button Segments) */}
               <div className="flex items-center justify-between pb-3.5 border-b border-[#F0EFEB] gap-2">
@@ -385,6 +387,7 @@ export const Hero: React.FC<HeroProps> = ({
               </div>
 
             </div>
+            </TiltCard>
           </div>
 
         </div>

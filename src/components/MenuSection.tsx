@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Plus, Sparkles, SlidersHorizontal, Settings, Clock } from 'lucide-react';
 import { MenuItem, MenuCategory, NigerianDietBadge, formatNaira } from '../types/restaurant';
+import { TiltCard } from './TiltCard';
 
 interface MenuSectionProps {
   menu: MenuItem[];
@@ -149,114 +150,121 @@ export const MenuSection: React.FC<MenuSectionProps> = ({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10 text-left">
-            {filteredItems.map((dish) => (
-              <article
+            {filteredItems.map((dish, idx) => (
+              <TiltCard
                 key={dish.id}
-                className="group relative bg-white rounded-3xl border border-[#E8E6DD] overflow-hidden hover:shadow-[0_16px_36px_rgba(18,17,16,0.06)] hover:border-[#14532D]/30 transition-all duration-300 flex flex-col justify-between"
+                maxTilt={6}
+                scale={1.015}
+                className="animate-fade-scale rounded-3xl"
               >
-                <div>
-                  {/* Photo Showcase */}
-                  <div 
-                    onClick={() => onSelectDish(dish)}
-                    className="relative aspect-[16/10] bg-[#F4F3ED] overflow-hidden cursor-pointer"
-                  >
-                    <img
-                      src={dish.image}
-                      alt={dish.name}
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
-                    />
-                    
-                    {/* Status Badge when sold out */}
-                    {!dish.available && (
-                      <div className="absolute inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center">
-                        <span className="px-3 py-1 bg-white text-[#121110] text-xs font-bold uppercase tracking-wider rounded-lg">
-                          Sold Out for Tonight
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Body Content */}
-                  <div className="p-6 sm:p-7 space-y-3">
-                    
-                    {/* Unboxed Metadata Strip (Zero-Pill Discipline) */}
-                    <div className="flex items-center gap-2 text-[11px] font-medium text-[#8C8A82]">
-                      <span className="text-[#14532D] font-bold uppercase tracking-wider">
-                        {dish.category}
-                      </span>
-                      <span aria-hidden="true">·</span>
-                      <span>{dish.prepTimeMinutes} mins</span>
-                      {dish.tags?.slice(0, 2).map((t) => (
-                        <React.Fragment key={t}>
-                          <span aria-hidden="true">·</span>
-                          <span className="capitalize">{t.replace('-', ' ')}</span>
-                        </React.Fragment>
-                      ))}
-                    </div>
-
-                    {/* Dish Titles */}
+                <article
+                  style={{ animationDelay: `${Math.min(idx * 60, 400)}ms` }}
+                  className="group relative bg-white rounded-3xl border border-[#E8E6DD] overflow-hidden hover:shadow-[0_20px_40px_rgba(18,17,16,0.08)] hover:border-[#14532D]/40 transition-all duration-300 flex flex-col justify-between h-full"
+                >
+                  <div>
+                    {/* Photo Showcase */}
                     <div 
                       onClick={() => onSelectDish(dish)}
-                      className="cursor-pointer space-y-0.5"
+                      className="relative aspect-[16/10] bg-[#F4F3ED] overflow-hidden cursor-pointer"
                     >
-                      <h3 className="font-display text-xl sm:text-2xl font-bold text-[#121110] group-hover:text-[#14532D] transition-colors leading-snug">
-                        {dish.name}
-                      </h3>
-                      {dish.yorubaName && (
-                        <p className="font-serif italic text-xs text-[#C2410C]">
-                          {dish.yorubaName}
-                        </p>
+                      <img
+                        src={dish.image}
+                        alt={dish.name}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      
+                      {/* Status Badge when sold out */}
+                      {!dish.available && (
+                        <div className="absolute inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center">
+                          <span className="px-3 py-1 bg-white text-[#121110] text-xs font-bold uppercase tracking-wider rounded-lg">
+                            Sold Out for Tonight
+                          </span>
+                        </div>
                       )}
                     </div>
 
-                    {/* Narrative Description */}
-                    <p className="text-xs text-[#595852] leading-relaxed line-clamp-3">
-                      {dish.description}
-                    </p>
+                    {/* Body Content */}
+                    <div className="p-6 sm:p-7 space-y-3">
+                      
+                      {/* Unboxed Metadata Strip (Zero-Pill Discipline) */}
+                      <div className="flex items-center gap-2 text-[11px] font-medium text-[#8C8A82]">
+                        <span className="text-[#14532D] font-bold uppercase tracking-wider">
+                          {dish.category}
+                        </span>
+                        <span aria-hidden="true">·</span>
+                        <span>{dish.prepTimeMinutes} mins</span>
+                        {dish.tags?.slice(0, 2).map((t) => (
+                          <React.Fragment key={t}>
+                            <span aria-hidden="true">·</span>
+                            <span className="capitalize">{t.replace('-', ' ')}</span>
+                          </React.Fragment>
+                        ))}
+                      </div>
 
-                    {/* Sommelier Pairing Note */}
-                    {dish.pairing && (
-                      <p className="text-[11px] text-[#8C8A82] italic pt-1 border-t border-[#F0EFEB]">
-                        <span className="text-[#121110] font-medium not-italic">Pair with: </span>
-                        {dish.pairing}
+                      {/* Dish Titles */}
+                      <div 
+                        onClick={() => onSelectDish(dish)}
+                        className="cursor-pointer space-y-0.5"
+                      >
+                        <h3 className="font-display text-xl sm:text-2xl font-bold text-[#121110] group-hover:text-[#14532D] transition-colors leading-snug">
+                          {dish.name}
+                        </h3>
+                        {dish.yorubaName && (
+                          <p className="font-serif italic text-xs text-[#C2410C]">
+                            {dish.yorubaName}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Narrative Description */}
+                      <p className="text-xs text-[#595852] leading-relaxed line-clamp-3">
+                        {dish.description}
                       </p>
-                    )}
 
-                  </div>
-                </div>
+                      {/* Sommelier Pairing Note */}
+                      {dish.pairing && (
+                        <p className="text-[11px] text-[#8C8A82] italic pt-1 border-t border-[#F0EFEB]">
+                          <span className="text-[#121110] font-medium not-italic">Pair with: </span>
+                          {dish.pairing}
+                        </p>
+                      )}
 
-                {/* Footer Action Bar */}
-                <div className="px-6 sm:px-7 pb-6 sm:pb-7 pt-2 flex items-center justify-between border-t border-[#F4F3ED]">
-                  <div>
-                    <span className="text-[10px] text-[#8C8A82] uppercase tracking-wider block">Price</span>
-                    <span className="font-mono text-lg font-bold text-[#121110] tabular-nums">
-                      {formatNaira(dish.price)}
-                    </span>
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => onSelectDish(dish)}
-                      className="px-3 py-2 text-xs font-medium text-[#595852] hover:text-[#121110] transition-colors cursor-pointer"
-                    >
-                      Details & Recipe
-                    </button>
+                  {/* Footer Action Bar */}
+                  <div className="px-6 sm:px-7 pb-6 sm:pb-7 pt-2 flex items-center justify-between border-t border-[#F4F3ED]">
+                    <div>
+                      <span className="text-[10px] text-[#8C8A82] uppercase tracking-wider block">Price</span>
+                      <span className="font-mono text-lg font-bold text-[#121110] tabular-nums">
+                        {formatNaira(dish.price)}
+                      </span>
+                    </div>
 
-                    <button
-                      type="button"
-                      disabled={!dish.available}
-                      onClick={() => onQuickAdd(dish)}
-                      className="px-4 py-2 bg-[#14532D] hover:bg-[#0D3823] disabled:opacity-40 text-white text-xs font-semibold rounded-xl transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                      <span>Order</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => onSelectDish(dish)}
+                        className="px-3 py-2 text-xs font-medium text-[#595852] hover:text-[#121110] transition-colors cursor-pointer"
+                      >
+                        Details & Recipe
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={!dish.available}
+                        onClick={() => onQuickAdd(dish)}
+                        className="btn-interactive px-4 py-2 bg-[#14532D] hover:bg-[#0D3823] disabled:opacity-40 text-white text-xs font-semibold rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Order</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
 
-              </article>
+                </article>
+              </TiltCard>
             ))}
           </div>
         )}

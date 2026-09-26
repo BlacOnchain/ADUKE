@@ -98,7 +98,7 @@ export const DishModal: React.FC<DishModalProps> = ({ item, onClose, onAddToCart
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
       <div 
-        className="relative w-full max-w-lg bg-white border border-[#E8E6DD] rounded-3xl overflow-hidden shadow-2xl my-8 text-left"
+        className="relative w-full max-w-lg bg-white border border-[#E8E6DD] rounded-3xl overflow-hidden shadow-2xl my-8 text-left animate-pop-in"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
