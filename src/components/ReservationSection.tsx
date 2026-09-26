@@ -171,7 +171,7 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
               </h3>
 
               <p className="text-xs text-emerald-100">
-                174 Franklin Street, Tribeca · Manhattan, NY 10013
+                14 Adeola Odeku Street, Victoria Island · Lagos State, Nigeria
               </p>
             </div>
 
@@ -208,7 +208,7 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
               <div className="flex items-center gap-3 text-xs text-[#595852] pt-2">
                 <ShieldCheck className="w-4 h-4 text-[#14532D] shrink-0" />
                 <span>
-                  Tables are held for 15 minutes past reservation time. Curbside valet welcomes you at the Franklin Street entrance.
+                  Tables are held for 15 minutes past reservation time. Executive valet service welcomes you at the Adeola Odeku entrance.
                 </span>
               </div>
 

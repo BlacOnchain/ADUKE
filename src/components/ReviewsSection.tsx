@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, MessageSquarePlus, CheckCircle2, X } from 'lucide-react';
+import { Star, MessageSquarePlus, CheckCircle2, X, AlertCircle, Sparkles } from 'lucide-react';
 import { CustomerReview } from '../types/restaurant';
 import { restaurantDB } from '../data/db';
 
@@ -16,6 +16,8 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({ reviews }) => {
   const [dishRecommended, setDishRecommended] = useState('Smoked Firewood Jollof Rice Royale');
   const [diningType, setDiningType] = useState<'Dinner' | 'Lunch' | 'Celebration'>('Dinner');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
 
   const averageRating = (
     reviews.reduce((acc, r) => acc + r.rating, 0) / (reviews.length || 1)
@@ -23,8 +25,10 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({ reviews }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError(null);
+
     if (!author.trim() || !comment.trim() || !title.trim()) {
-      alert('Please fill in your name, headline, and dining review.');
+      setFormError('Please fill in your name, headline, and dining review.');
       return;
     }
 
@@ -44,6 +48,8 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({ reviews }) => {
       setAuthor('');
       setTitle('');
       setComment('');
+      setShowSuccessToast(true);
+      setTimeout(() => setShowSuccessToast(false), 4000);
     }, 400);
   };
 
@@ -83,6 +89,22 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({ reviews }) => {
             <span>Share Your Dining Experience</span>
           </button>
         </div>
+
+        {/* Success Toast Banner */}
+        {showSuccessToast && (
+          <div className="mb-6 p-4 rounded-2xl bg-[#DCFCE7] border border-emerald-300 text-[#14532D] text-xs font-semibold flex items-center justify-between animate-fadeIn shadow-sm">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-[#14532D]" />
+              <span>Thank you! Your dining review and recommendation have been published live to our hearth guestbook.</span>
+            </div>
+            <button
+              onClick={() => setShowSuccessToast(false)}
+              className="text-[#14532D] hover:opacity-75 p-1 cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
 
         {/* Reviews Grid — Airy, Non-AI-Boxed Presentation */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-12 text-left">
@@ -153,6 +175,13 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({ reviews }) => {
 
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               
+              {formError && (
+                <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                  <span>{formError}</span>
+                </div>
+              )}
+
               {/* Star Rating */}
               <div className="space-y-1.5">
                 <label className="block text-[#121110] font-semibold">Your Overall Rating</label>

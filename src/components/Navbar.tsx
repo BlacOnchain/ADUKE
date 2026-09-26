@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Utensils, User, LogOut, Shield, Menu, X, QrCode, Sparkles, Bell } from 'lucide-react';
+import { ShoppingBag, Utensils, User, LogOut, Menu, X, QrCode, Sparkles, Bell, Phone, Mail, Shield } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { RestaurantOrder, TableSession, formatNaira } from '../types/restaurant';
 import { notificationService } from '../services/notificationService';
@@ -34,12 +35,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   activeTableSession,
   activeOrder,
   onOpenTracker,
-  isStaffMode,
-  onToggleStaffMode,
   onOpenAuth,
-  onOpenMenuManager,
 }) => {
-  const { currentUser, profile, logout } = useAuth();
+  const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hasUnread, setHasUnread] = useState(false);
 
@@ -58,18 +57,25 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'order-history', label: 'Order History' },
     { id: 'reservation', label: 'Reservations' },
     { id: 'story', label: 'Our Story' },
+    { id: 'reviews', label: 'Reviews' },
   ];
+
+  const handleLogoClick = () => {
+    onNavigate('hero');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <header className="sticky top-0 z-40 bg-[#FAFAF7]/95 backdrop-blur-md border-b border-[#E8E6DD]/80 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           
-          {/* ZONE 1: Brand Wordmark */}
+          {/* ZONE 1: Brand Wordmark (Clickable Logo) */}
           <div className="flex items-center gap-6">
             <button
-              onClick={() => onNavigate('hero')}
+              onClick={handleLogoClick}
               className="text-left group flex items-baseline gap-2 cursor-pointer"
+              title="Àdùkẹ́ Home"
             >
               <span className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-[#121110] group-hover:text-[#14532D] transition-colors">
                 Àdùkẹ́
@@ -103,7 +109,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </nav>
 
           {/* ZONE 3: Functional Actions */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 sm:gap-2.5">
 
             {/* Scan QR Table Ordering Action */}
             <button
@@ -152,7 +158,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               onClick={onOpenCart}
               aria-label="View shopping bag"
-              className="relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#121110] hover:bg-white bg-[#FAFAF7] border border-[#E8E6DD] transition-all cursor-pointer shadow-2xs"
+              className="relative flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-semibold text-[#121110] hover:bg-white bg-[#FAFAF7] border border-[#E8E6DD] transition-all cursor-pointer shadow-2xs"
             >
               <ShoppingBag className="w-4 h-4 text-[#14532D]" />
               <span className="hidden sm:inline">Bag</span>
@@ -179,8 +185,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>Book Table</span>
             </button>
 
-
-
             {/* User Auth */}
             {currentUser ? (
               <button
@@ -194,17 +198,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 onClick={onOpenAuth}
                 className="p-2 rounded-xl bg-white border border-[#E8E6DD] text-[#595852] hover:text-[#121110] hover:bg-[#F4F3ED] transition-colors cursor-pointer"
-                title="Restricted Staff Login"
+                title="Account / Guest Sign In"
               >
                 <User className="w-4 h-4" />
               </button>
             )}
 
-            {/* Mobile Navigation Toggle */}
+            {/* Mobile Navigation Toggle Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2 rounded-xl bg-white border border-[#E8E6DD] text-[#121110] hover:bg-[#F4F3ED] transition-colors cursor-pointer"
-              aria-label="Toggle menu"
+              aria-label="Toggle navigation menu"
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -213,33 +218,40 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         </div>
 
-        {/* Mobile Navigation Drawer */}
+        {/* Full Mobile Navigation Menu Drawer */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-[#E8E6DD] space-y-2 text-left animate-fadeIn">
-            {navLinks.map((link) => (
-              <button
-                key={link.id}
-                onClick={() => {
-                  onNavigate(link.id);
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-[#121110] hover:bg-white transition-colors flex items-center justify-between"
-              >
-                <span>{link.label}</span>
-                <span className="text-[#8C8A82]">→</span>
-              </button>
-            ))}
+            <div className="space-y-1">
+              {navLinks.map((link) => (
+                <button
+                  key={link.id}
+                  onClick={() => {
+                    onNavigate(link.id);
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-colors flex items-center justify-between ${
+                    activeSection === link.id
+                      ? 'bg-[#DCFCE7] text-[#14532D] font-bold'
+                      : 'text-[#121110] hover:bg-white'
+                  }`}
+                >
+                  <span>{link.label}</span>
+                  <span className="text-[#8C8A82]">→</span>
+                </button>
+              ))}
+            </div>
 
-            <div className="pt-3 border-t border-[#E8E6DD] flex items-center gap-2">
+            {/* Primary Mobile Action Buttons */}
+            <div className="pt-3 border-t border-[#E8E6DD] grid grid-cols-2 gap-2">
               <button
                 onClick={() => {
                   onOpenScanQR();
                   setMobileMenuOpen(false);
                 }}
-                className="flex-1 py-2.5 bg-white border border-[#E8E6DD] text-[#121110] font-bold text-xs rounded-xl flex items-center justify-center gap-2"
+                className="py-2.5 bg-white border border-[#E8E6DD] text-[#121110] font-bold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
               >
                 <QrCode className="w-4 h-4 text-[#14532D]" />
-                <span>Scan Table QR</span>
+                <span>Scan QR</span>
               </button>
 
               <button
@@ -247,10 +259,32 @@ export const Navbar: React.FC<NavbarProps> = ({
                   onOpenReservation();
                   setMobileMenuOpen(false);
                 }}
-                className="flex-1 py-2.5 bg-[#14532D] text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2"
+                className="py-2.5 bg-[#14532D] text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-xs"
               >
                 <Utensils className="w-4 h-4" />
                 <span>Book Table</span>
+              </button>
+            </div>
+
+            {/* Direct Mobile Quick Contact & Staff Link */}
+            <div className="pt-3 border-t border-[#E8E6DD] flex items-center justify-between text-xs text-[#595852] px-1">
+              <a
+                href="tel:+23414608910"
+                className="flex items-center gap-1.5 font-medium text-[#14532D] hover:underline"
+              >
+                <Phone className="w-3.5 h-3.5" />
+                <span>+234 1 460 8910</span>
+              </a>
+
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  navigate('/admin');
+                }}
+                className="text-[#8C8A82] hover:text-[#121110] font-mono text-[11px] flex items-center gap-1 cursor-pointer"
+              >
+                <Shield className="w-3 h-3 text-[#14532D]" />
+                <span>Staff Portal</span>
               </button>
             </div>
           </div>

@@ -1,22 +1,76 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Àdùkẹ́ — Modern Nigerian Gastronomy</title>
-    <meta name="description" content="Contemporary Nigerian dining celebrating firewood embers, slow-braised oxtail efo riro, smoky party jollof, and chilled palm wine in Victoria Island, Lagos." />
-    <meta property="og:title" content="Àdùkẹ́ — Modern Nigerian Gastronomy" />
-    <meta property="og:description" content="Contemporary Nigerian dining celebrating firewood embers, slow-braised oxtail efo riro, smoky party jollof, and chilled palm wine in Victoria Island, Lagos." />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    
+    <!-- Primary Title & Meta Description -->
+    <title>Àdùkẹ́ — Modern Nigerian Gastronomy | Victoria Island, Lagos</title>
+    <meta name="description" content="Contemporary Nigerian dining in Victoria Island, Lagos celebrating woodfire hearths, slow-braised oxtail efo riro, smoky firewood jollof, tiger prawn suya, and table reservations." />
+    <meta name="keywords" content="Nigerian restaurant Lagos, modern Nigerian dining, woodfire jollof rice, Victoria Island restaurants, efo riro, suya skewers, Lagos fine dining, Àdùkẹ́ Lagos" />
+    <meta name="author" content="Àdùkẹ́ Hospitality Group" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Canonical & Theme -->
     <meta name="theme-color" content="#14532D" />
-    <link rel="icon" href="./favicon.svg">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="restaurant.restaurant" />
+    <meta property="og:site_name" content="Àdùkẹ́ Gastronomy" />
+    <meta property="og:title" content="Àdùkẹ́ — Modern Nigerian Gastronomy | Victoria Island, Lagos" />
+    <meta property="og:description" content="Contemporary Nigerian dining celebrating woodfire embers, slow-braised oxtail efo riro, smoky party jollof, and cold-pressed native herbs in Victoria Island, Lagos." />
+    <meta property="og:locale" content="en_NG" />
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Àdùkẹ́ — Modern Nigerian Gastronomy | Victoria Island, Lagos" />
+    <meta name="twitter:description" content="Contemporary Nigerian dining celebrating woodfire embers, slow-braised oxtail efo riro, smoky party jollof, and table reservations in Victoria Island, Lagos." />
+
+    <!-- Typography Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Schema.org Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Restaurant",
+      "name": "Àdùkẹ́ — Modern Nigerian Gastronomy",
+      "image": "/assets/images/hero_nigerian_restaurant_1790149661135.jpg",
+      "description": "Contemporary Nigerian gastronomy celebrating woodfire embers, slow-braised oxtail efo riro, smoky party jollof, and cold-pressed native herbs.",
+      "servesCuisine": ["Nigerian", "West African", "Contemporary African"],
+      "priceRange": "₦₦₦",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "14 Adeola Odeku Street",
+        "addressLocality": "Victoria Island",
+        "addressRegion": "Lagos State",
+        "addressCountry": "NG"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 6.4281,
+        "longitude": 3.4219
+      },
+      "telephone": "+23414608910",
+      "email": "concierge@aduke.lagos.ng",
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+          "opens": "12:00",
+          "closes": "23:30"
+        }
+      ],
+      "acceptsReservations": "True"
+    }
+    </script>
   </head>
-  <body class="bg-[#FAFAF7] text-[#121110] antialiased selection:bg-[#14532D] selection:text-white">
-    <div id="root"></div>
+  <body class="bg-[#FAFAF7] text-[#121110] antialiased selection:bg-[#14532D] selection:text-white min-h-screen overflow-x-hidden">
+    <div id="root" class="min-h-screen flex flex-col overflow-x-hidden"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

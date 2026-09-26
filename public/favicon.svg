@@ -1,5 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect width="100" height="100" rx="24" fill="#14532D"/>
-  <path d="M50 20c-12 18-20 28-20 42a20 20 0 1040 0c0-14-8-24-20-42z" fill="#C2410C"/>
-  <path d="M50 38c-6 10-10 16-10 24a10 10 0 1020 0c0-8-4-14-10-24z" fill="#C89B3C"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="emeraldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#14532D" />
+      <stop offset="100%" stop-color="#0D3823" />
+    </linearGradient>
+    <linearGradient id="fireGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#C2410C" />
+      <stop offset="60%" stop-color="#EA580C" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+    <linearGradient id="brassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D" />
+      <stop offset="100%" stop-color="#C89B3C" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Rounded Base Badge -->
+  <rect width="128" height="128" rx="32" fill="url(#emeraldGrad)" />
+  <rect x="3" y="3" width="122" height="122" rx="29" fill="none" stroke="#C89B3C" stroke-width="2" stroke-opacity="0.3" />
+
+  <!-- Outer Hearth Flame & Leaf Stylized Emblem -->
+  <path d="M64 22 C44 44 32 60 32 78 C32 96 46 108 64 108 C82 108 96 96 96 78 C96 60 84 44 64 22 Z" fill="url(#fireGrad)" />
+  
+  <!-- Inner Hearth Core & Golden Spark -->
+  <path d="M64 48 C54 62 48 72 48 84 C48 94 55 100 64 100 C73 100 80 94 80 84 C80 72 74 62 64 48 Z" fill="url(#brassGrad)" />
+  
+  <!-- Hearth Center Ember -->
+  <circle cx="64" cy="86" r="6" fill="#FFFFFF" opacity="0.9" />
+  
+  <!-- Traditional Accent Dot -->
+  <circle cx="64" cy="18" r="3" fill="#FCD34D" />
 </svg>

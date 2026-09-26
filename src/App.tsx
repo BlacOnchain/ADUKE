@@ -38,6 +38,7 @@ import { OrderHistoryDashboard } from './components/OrderHistoryDashboard';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { AdminLogin } from './components/AdminLogin';
 import { StaffOnboarding } from './components/StaffOnboarding';
+import { NotFound } from './components/NotFound';
 
 function MainApp() {
   // DB Reactive State
@@ -382,9 +383,11 @@ export default function App() {
       <AuthProvider>
         <RedirectHandler />
         <Routes>
+          <Route path="/" element={<MainApp />} />
           <Route path="/admin" element={<AdminRouteWrapper />} />
           <Route path="/staff-onboard" element={<StaffOnboarding />} />
-          <Route path="/*" element={<MainApp />} />
+          <Route path="/404" element={<NotFound />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

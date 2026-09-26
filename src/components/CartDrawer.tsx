@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Bike, Store, Utensils, QrCode, User } from 'lucide-react';
+import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Bike, Store, Utensils, QrCode, User, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { CartItem, OrderType, RestaurantOrder, TableSession, formatNaira } from '../types/restaurant';
 import { restaurantDB } from '../data/db';
 import { notificationService } from '../services/notificationService';
@@ -41,6 +41,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   const [tipPercentage, setTipPercentage] = useState<number>(10);
   const [specialNotes, setSpecialNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   useEffect(() => {
     if (activeTableSession) {
@@ -63,14 +64,15 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
   const handleCheckout = (e: React.FormEvent) => {
     e.preventDefault();
+    setCheckoutError(null);
 
     if (!customerName.trim() || !customerPhone.trim()) {
-      alert('Please provide your name and phone number for order updates.');
+      setCheckoutError('Please provide your name and contact phone number for order updates.');
       return;
     }
 
     if (orderType === 'delivery' && !deliveryAddress.trim()) {
-      alert('Please provide your Lagos delivery destination address.');
+      setCheckoutError('Please provide your Lagos delivery destination address.');
       return;
     }
 
@@ -454,6 +456,13 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       <span className="font-mono text-base text-[#14532D]">{formatNaira(total)}</span>
                     </div>
                   </div>
+
+                  {checkoutError && (
+                    <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                      <span>{checkoutError}</span>
+                    </div>
+                  )}
 
                   <button
                     type="submit"

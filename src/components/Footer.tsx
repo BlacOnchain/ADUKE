@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Phone, Clock, ShieldCheck } from 'lucide-react';
+import { MapPin, Phone, Clock, ShieldCheck, Mail, ArrowUpRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface FooterProps {
@@ -11,24 +11,42 @@ interface FooterProps {
 export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenLegal }) => {
   const navigate = useNavigate();
 
+  const handleDirectionsClick = () => {
+    // Open Google Maps coordinates for Victoria Island location or scroll to reservation
+    window.open(
+      'https://maps.google.com/?q=14+Adeola+Odeku+Street+Victoria+Island+Lagos+Nigeria',
+      '_blank',
+      'noopener,noreferrer'
+    );
+  };
+
   return (
-    <footer className="bg-[#FAFAF7] text-[#121110] border-t border-[#E8E6DD] pt-20 pb-12">
+    <footer className="bg-[#FAFAF7] text-[#121110] border-t border-[#E8E6DD] pt-16 sm:pt-20 pb-12 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* 4-Column Editorial Grid — Airy & Spacious */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-16 border-b border-[#E8E6DD] text-left">
+        {/* 4-Column Editorial Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 pb-16 border-b border-[#E8E6DD] text-left">
           
           {/* Column 1: Brand Ethos */}
           <div className="space-y-4">
-            <div className="flex items-baseline gap-2">
-              <span className="font-display text-3xl font-bold tracking-tight text-[#121110]">
+            <button
+              onClick={() => onNavigate('hero')}
+              className="group flex items-baseline gap-2 cursor-pointer text-left"
+              title="Return to top"
+            >
+              <span className="font-display text-3xl font-bold tracking-tight text-[#121110] group-hover:text-[#14532D] transition-colors">
                 Àdùkẹ́
               </span>
               <span className="w-2 h-2 rounded-full bg-[#14532D]" />
-            </div>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-[#8C8A82]">
+                Lagos
+              </span>
+            </button>
+
             <p className="text-xs text-[#595852] leading-relaxed">
               Contemporary Nigerian gastronomy celebrating the embers of firewood hearths, 8-hour braised oxtail efo riro, smoky party jollof, and cold-pressed native herbs.
             </p>
+
             <div className="pt-2">
               <button
                 onClick={onBookTable}
@@ -75,9 +93,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenL
               <p className="pt-1 text-[#8C8A82]">
                 Guarded courtyard parking and complimentary executive valet service from 12:00 PM onwards.
               </p>
-              <p className="text-[#8C8A82]">
-                Transit: Falomo Bridge / Ozumba Mbadiwe corridor.
-              </p>
+              <button
+                onClick={handleDirectionsClick}
+                className="pt-1 inline-flex items-center gap-1 text-xs font-semibold text-[#14532D] hover:underline cursor-pointer"
+              >
+                <span>Get Driving Directions</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
 
@@ -87,10 +109,38 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenL
               <Phone className="w-3.5 h-3.5 text-[#14532D]" />
               <span>Direct Inquiries</span>
             </h4>
-            <div className="space-y-1.5 text-[#595852]">
-              <p>Host Concierge: <span className="font-mono font-semibold text-[#121110]">+234 1 460 8910</span></p>
-              <p>Floor Manager: <span className="font-mono font-semibold text-[#121110]">+234 803 555 1204</span></p>
-              <p>Private Dining: <span className="text-[#14532D] underline font-medium">concierge@aduke.lagos.ng</span></p>
+            <div className="space-y-2 text-[#595852]">
+              <div>
+                <span className="text-[#8C8A82] block text-[11px]">Host Stand Concierge:</span>
+                <a
+                  href="tel:+23414608910"
+                  className="font-mono font-semibold text-[#121110] hover:text-[#14532D] transition-colors"
+                >
+                  +234 1 460 8910
+                </a>
+              </div>
+
+              <div>
+                <span className="text-[#8C8A82] block text-[11px]">Floor Manager Mobile:</span>
+                <a
+                  href="tel:+2348035551204"
+                  className="font-mono font-semibold text-[#121110] hover:text-[#14532D] transition-colors"
+                >
+                  +234 803 555 1204
+                </a>
+              </div>
+
+              <div>
+                <span className="text-[#8C8A82] block text-[11px]">Private Dining & Bookings:</span>
+                <a
+                  href="mailto:concierge@aduke.lagos.ng"
+                  className="text-[#14532D] font-medium hover:underline flex items-center gap-1"
+                >
+                  <Mail className="w-3 h-3" />
+                  <span>concierge@aduke.lagos.ng</span>
+                </a>
+              </div>
+
               <div className="pt-2 flex items-center gap-2 text-[#8C8A82]">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#14532D]" />
                 <span>Protected by Google Cloud Firestore</span>
@@ -104,7 +154,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenL
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#8C8A82]">
           <p>© {new Date().getFullYear()} Àdùkẹ́ Hospitality Group. All rights reserved.</p>
           
-          <div className="flex flex-wrap items-center gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-6">
             <button
               onClick={() => onOpenLegal('privacy')}
               className="hover:text-[#121110] transition-colors cursor-pointer"
@@ -121,7 +171,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenL
               onClick={() => onNavigate('menu')}
               className="hover:text-[#121110] transition-colors cursor-pointer"
             >
-              Menu
+              Culinary Menu
             </button>
             <button
               onClick={() => onNavigate('reservation')}
@@ -130,18 +180,24 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenL
               Reservations
             </button>
             <button
-              onClick={() => onNavigate('location')}
+              onClick={() => onNavigate('story')}
+              className="hover:text-[#121110] transition-colors cursor-pointer"
+            >
+              Our Story
+            </button>
+            <button
+              onClick={handleDirectionsClick}
               className="hover:text-[#121110] transition-colors cursor-pointer"
             >
               Directions
             </button>
-            {/* Discrete staff entry — not labelled prominently */}
+            {/* Staff portal link */}
             <button
               onClick={() => navigate('/admin')}
-              className="text-[#D4D2CC] hover:text-[#8C8A82] transition-colors cursor-pointer text-[10px]"
+              className="text-[#8C8A82] hover:text-[#14532D] font-mono transition-colors cursor-pointer text-xs flex items-center gap-1"
               title="Staff Operations Portal"
             >
-              Staff
+              <span>Staff Portal</span>
             </button>
           </div>
         </div>
