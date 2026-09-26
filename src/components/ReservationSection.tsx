@@ -132,19 +132,19 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="max-w-2xl mx-auto text-center space-y-4 mb-16">
-          <div className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-[#14532D]">
+        <div className="max-w-2xl mx-auto text-center space-y-3 mb-12">
+          <div className="inline-flex items-center gap-2 text-xs font-bold tracking-wider uppercase text-[#14532D]">
             <Sparkles className="w-3.5 h-3.5 text-[#C89B3C]" />
-            <span>Curated Concierge Reservations</span>
+            <span>Table Reservations</span>
           </div>
           <h2 
-            className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#121110]"
+            className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#121110]"
             style={{ textWrap: 'balance' }}
           >
-            Reserve your table around our hearth.
+            Book your table with us.
           </h2>
-          <p className="text-sm sm:text-base text-[#595852] font-normal leading-relaxed">
-            Direct table allocation guaranteed with live Firestore synchronization and automatic double-booking prevention.
+          <p className="text-xs sm:text-base text-[#595852] font-normal leading-relaxed">
+            Reserve your table in seconds and we'll have your spot and warm hospitality ready when you arrive.
           </p>
         </div>
 
@@ -238,26 +238,17 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
             onSubmit={handleBookingSubmit}
             className="bg-white rounded-3xl border border-[#E8E6DD] shadow-[0_16px_40px_rgba(18,17,16,0.04)] p-8 sm:p-12 space-y-10 text-left"
           >
-            {/* Step 1: Atmosphere & Dining Area Selection */}
+            {/* Step 1: Seating Area Selection */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-display text-xl font-bold text-[#121110]">
-                    1. Select Dining Atmosphere
+                  <h3 className="font-display text-lg sm:text-xl font-bold text-[#121110]">
+                    1. Choose Seating Area
                   </h3>
                   <p className="text-xs text-[#595852] mt-0.5">
-                    Each pavilion offers a distinct soundscape and culinary vantage point.
+                    Select where you'd like your table set.
                   </p>
                 </div>
-                {onViewDiagram && (
-                  <button
-                    type="button"
-                    onClick={onViewDiagram}
-                    className="text-xs text-[#14532D] hover:underline font-semibold cursor-pointer"
-                  >
-                    View Floor Plan Blueprint →
-                  </button>
-                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -298,15 +289,15 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
 
             {/* Step 2: Date, Party Size & Sittings */}
             <div className="space-y-6 pt-6 border-t border-[#E8E6DD]">
-              <h3 className="font-display text-xl font-bold text-[#121110]">
-                2. Date, Time & Party Size
+              <h3 className="font-display text-lg sm:text-xl font-bold text-[#121110]">
+                2. Date, Time & Number of Guests
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                 {/* Date Picker */}
                 <div className="space-y-1.5">
                   <label htmlFor="res-date" className="block font-semibold text-[#121110]">
-                    Select Date *
+                    Date *
                   </label>
                   <div className="relative">
                     <input
@@ -343,7 +334,7 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                 {/* Occasion */}
                 <div className="space-y-1.5">
                   <label htmlFor="res-occasion" className="block font-semibold text-[#121110]">
-                    Dining Occasion
+                    Occasion
                   </label>
                   <select
                     id="res-occasion"
@@ -351,19 +342,19 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                     onChange={(e) => setOccasion(e.target.value)}
                     className="w-full px-3.5 py-2.5 bg-[#FAFAF7] border border-[#E8E6DD] rounded-xl text-[#121110] focus:outline-none focus:border-[#14532D]"
                   >
-                    <option value="Dinner Service">Dinner Service</option>
-                    <option value="Birthday Celebration">Birthday Celebration</option>
-                    <option value="Anniversary">Romantic Anniversary</option>
-                    <option value="Business Executive">Business Dinner</option>
-                    <option value="Family Gathering">Family Gathering</option>
+                    <option value="Dinner Service">Dinner</option>
+                    <option value="Birthday Celebration">Birthday</option>
+                    <option value="Anniversary">Anniversary</option>
+                    <option value="Business Executive">Business Meal</option>
+                    <option value="Family Gathering">Family & Friends</option>
                   </select>
                 </div>
               </div>
 
-              {/* Time Slot Selection Grid with Real-Time Capacity Feedback */}
+              {/* Time Slot Selection */}
               <div className="space-y-2">
                 <span className="block text-xs font-semibold text-[#121110]">
-                  Sitting Times (Double-Booking Protection Active)
+                  Select Time
                 </span>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
