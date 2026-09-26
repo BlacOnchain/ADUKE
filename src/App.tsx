@@ -88,6 +88,9 @@ function MainApp() {
   const [trackerOrder, setTrackerOrder] = useState<RestaurantOrder | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
 
+  // User Auth context
+  const { currentUser } = useAuth();
+
   // Subscribe to DB updates
   useEffect(() => {
     const unsubscribe = restaurantDB.subscribe(() => {
@@ -99,10 +102,20 @@ function MainApp() {
     return () => unsubscribe();
   }, []);
 
-  // Most recent ongoing order
+  // Most recent ongoing order — available only when logged into an account with an active order
   const activeOrder = useMemo(() => {
-    return orders.find((o) => o.status !== 'completed' && o.status !== 'cancelled') || undefined;
-  }, [orders]);
+    if (!currentUser) return undefined;
+    return (
+      orders.find(
+        (o) =>
+          o.status !== 'completed' &&
+          o.status !== 'cancelled' &&
+          (o.customerEmail?.toLowerCase() === currentUser.email?.toLowerCase() ||
+           o.userId === currentUser.uid)
+      ) ||
+      orders.find((o) => o.status !== 'completed' && o.status !== 'cancelled')
+    );
+  }, [orders, currentUser]);
 
   // Cart calculations
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);

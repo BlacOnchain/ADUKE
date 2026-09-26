@@ -130,14 +130,28 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </button>
             
-            {/* Live Order Tracker Trigger if user placed an active order */}
-            {activeOrder && (
+            {/* Live Order Tracker Trigger — Only shown and functional when user is logged in AND has an active order */}
+            {currentUser && activeOrder && (
               <button
                 onClick={onOpenTracker}
-                className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-[#DCFCE7] text-[#14532D] hover:bg-[#BBF7D0] rounded-full text-xs font-semibold transition-colors cursor-pointer"
+                className="hidden lg:flex items-center gap-2 px-3.5 py-2 bg-[#DCFCE7] text-[#14532D] hover:bg-[#BBF7D0] border border-emerald-300 rounded-xl text-xs font-semibold transition-all cursor-pointer shadow-2xs group"
+                title={`Track Order #${activeOrder.orderNumber}`}
               >
-                <span className="w-2 h-2 rounded-full bg-[#14532D] animate-ping" />
-                <span className="font-mono">Order #{activeOrder.orderNumber}</span>
+                <span className="w-2 h-2 rounded-full bg-[#14532D] animate-pulse" />
+                <span className="font-mono text-xs font-bold tracking-tight">
+                  Order #{activeOrder.orderNumber}
+                </span>
+                <span className="text-[10px] text-emerald-800 uppercase font-mono px-1.5 py-0.5 bg-emerald-100 rounded-md font-medium">
+                  {activeOrder.status === 'placed'
+                    ? 'Placed'
+                    : activeOrder.status === 'confirmed'
+                    ? 'Confirmed'
+                    : activeOrder.status === 'cooking'
+                    ? 'Cooking'
+                    : activeOrder.status === 'ready'
+                    ? 'Ready'
+                    : 'Active'}
+                </span>
               </button>
             )}
 
@@ -240,6 +254,37 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               ))}
             </div>
+
+            {/* Live Order Tracker on Mobile — When logged in with active order */}
+            {currentUser && activeOrder && (
+              <div className="p-3 bg-[#DCFCE7]/70 border border-emerald-300/80 rounded-2xl flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2 h-2 rounded-full bg-[#14532D] animate-pulse" />
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono text-xs font-bold text-[#121110]">
+                        Order #{activeOrder.orderNumber}
+                      </span>
+                      <span className="text-[10px] text-emerald-800 uppercase font-mono px-1.5 py-0.5 bg-emerald-100 rounded-md font-medium">
+                        {activeOrder.status}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-[#595852] mt-0.5">
+                      {activeOrder.items.length} {activeOrder.items.length === 1 ? 'item' : 'items'} · ETA: {activeOrder.estimatedDeliveryTime}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    onOpenTracker?.();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="px-3 py-1.5 bg-[#14532D] text-white text-xs font-semibold rounded-lg cursor-pointer shadow-xs"
+                >
+                  Track
+                </button>
+              </div>
+            )}
 
             {/* Primary Mobile Action Buttons */}
             <div className="pt-3 border-t border-[#E8E6DD] grid grid-cols-2 gap-2">

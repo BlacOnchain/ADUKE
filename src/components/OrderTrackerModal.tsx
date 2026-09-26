@@ -11,7 +11,8 @@ import {
   Bike,
   PackageCheck,
   MapPin,
-  Sparkles,
+  Utensils,
+  Clock,
 } from 'lucide-react';
 import { RestaurantOrder, OrderStatus, formatNaira } from '../types/restaurant';
 
@@ -28,14 +29,14 @@ export const OrderTrackerModal: React.FC<OrderTrackerModalProps> = ({ order, onC
     {
       status: 'placed',
       title: 'Order Placed',
-      subtitle: 'Received by the kitchen host station in Victoria Island.',
+      subtitle: 'Received by kitchen host station in Victoria Island.',
       icon: <CheckCircle2 className="w-4 h-4" />,
     },
     {
       status: 'confirmed',
       title: 'Confirmed by Grill Master & Head Chef',
-      subtitle: 'Prime cuts seasoned with northern yaji and organic spices.',
-      icon: <Sparkles className="w-4 h-4" />,
+      subtitle: 'Prime cuts seasoned with northern yaji and fresh herbs.',
+      icon: <Utensils className="w-4 h-4" />,
     },
     {
       status: 'cooking',
@@ -45,8 +46,8 @@ export const OrderTrackerModal: React.FC<OrderTrackerModalProps> = ({ order, onC
     },
     {
       status: 'ready',
-      title: order.orderType === 'delivery' ? 'Dispatched with Insulated Courier' : 'Plated & Ready at Host Stand',
-      subtitle: order.orderType === 'delivery' ? 'Temperature-controlled courier en route.' : 'Awaiting guest at host counter.',
+      title: order.orderType === 'delivery' ? 'Dispatched with Insulated Courier' : 'Plated & Ready for Table Service',
+      subtitle: order.orderType === 'delivery' ? 'Temperature-controlled courier en route.' : 'Served fresh to your table.',
       icon: order.orderType === 'delivery' ? <Bike className="w-4 h-4 text-[#14532D]" /> : <PackageCheck className="w-4 h-4 text-[#14532D]" />,
     },
     {
@@ -61,13 +62,13 @@ export const OrderTrackerModal: React.FC<OrderTrackerModalProps> = ({ order, onC
   const currentStageIndex = stageOrder.indexOf(order.status);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm overflow-y-auto animate-fadeIn">
       <div 
         className="relative w-full max-w-xl bg-white border border-[#E8E6DD] rounded-3xl overflow-hidden shadow-2xl my-8 text-left animate-pop-in"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="p-6 bg-[#FAFAF7] border-b border-[#E8E6DD] flex items-center justify-between">
+        <div className="p-5 sm:p-6 bg-[#FAFAF7] border-b border-[#E8E6DD] flex items-center justify-between">
           <div className="space-y-0.5">
             <div className="flex items-center gap-2">
               <span className="font-display text-lg font-bold text-[#121110]">
@@ -89,14 +90,17 @@ export const OrderTrackerModal: React.FC<OrderTrackerModalProps> = ({ order, onC
         </div>
 
         {/* Status Highlights Banner */}
-        <div className="p-6 bg-[#DCFCE7]/60 border-b border-[#DCFCE7] flex items-center justify-between">
+        <div className="p-5 sm:p-6 bg-[#DCFCE7]/60 border-b border-[#DCFCE7] flex items-center justify-between">
           <div>
             <span className="text-[11px] text-[#14532D] uppercase font-bold tracking-wider block">
-              Estimated Arrival / Ready
+              Estimated Ready / Arrival
             </span>
-            <span className="font-display text-2xl sm:text-3xl font-bold text-[#121110]">
-              {order.status === 'completed' ? 'Delivered' : order.estimatedDeliveryTime}
-            </span>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <Clock className="w-4 h-4 text-[#14532D]" />
+              <span className="font-display text-2xl sm:text-3xl font-bold text-[#121110]">
+                {order.status === 'completed' ? 'Delivered' : order.estimatedDeliveryTime}
+              </span>
+            </div>
           </div>
 
           <div className="text-right">
@@ -120,7 +124,7 @@ export const OrderTrackerModal: React.FC<OrderTrackerModalProps> = ({ order, onC
                   <div
                     className={`absolute -left-6 sm:-left-8 top-0.5 w-5 h-5 rounded-full flex items-center justify-center transition-all ${
                       isCurrent
-                        ? 'bg-[#14532D] text-white shadow-[0_0_12px_rgba(20,83,45,0.4)]'
+                        ? 'bg-[#14532D] text-white shadow-[0_0_12px_rgba(20,83,45,0.4)] ring-2 ring-[#DCFCE7]'
                         : isPast
                         ? 'bg-[#121110] text-white'
                         : 'bg-white border-2 border-[#E8E6DD] text-[#AAA]'
@@ -184,10 +188,10 @@ export const OrderTrackerModal: React.FC<OrderTrackerModalProps> = ({ order, onC
 
         {/* Footer */}
         <div className="p-4 bg-[#FAFAF7] border-t border-[#E8E6DD] flex items-center justify-between text-xs text-[#8C8A82]">
-          <span>Need assistance? Concierge desk: +234 1 460 8910</span>
+          <span>Concierge desk: +234 1 460 8910</span>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-white border border-[#E8E6DD] hover:bg-[#F4F3ED] text-[#121110] font-medium rounded-xl transition-colors cursor-pointer"
+            className="px-4 py-2 bg-white border border-[#E8E6DD] hover:bg-[#F4F3ED] text-[#121110] font-medium rounded-xl transition-colors cursor-pointer shadow-2xs"
           >
             Close Tracker
           </button>

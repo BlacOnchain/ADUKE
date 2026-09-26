@@ -6,7 +6,6 @@ import {
   VolumeX,
   CheckCircle2,
   AlertCircle,
-  Sparkles,
   Send,
   ShieldCheck,
   Flame,
