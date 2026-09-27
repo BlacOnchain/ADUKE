@@ -5,9 +5,9 @@ import {
   MapPin,
   Clock,
 } from 'lucide-react';
-import heroImg from '../assets/images/hero_nigerian_restaurant_1790149661135.jpg';
-import jollofImg from '../assets/images/nigerian_jollof_deluxe_1790149678289.jpg';
-import suyaImg from '../assets/images/nigerian_suya_prawns_1790149701081.jpg';
+import heroImg from '../assets/images/hero_nigerian_restaurant_1790149661135.webp';
+import jollofImg from '../assets/images/nigerian_jollof_deluxe_1790149678289.webp';
+import suyaImg from '../assets/images/nigerian_suya_prawns_1790149701081.webp';
 import { TiltCard } from './TiltCard';
 
 interface HeroProps {

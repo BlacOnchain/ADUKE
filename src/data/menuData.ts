@@ -1,7 +1,7 @@
 import { MenuItem, SeatingArea, CustomerReview } from '../types/restaurant';
-import jollofImg from '../assets/images/nigerian_jollof_deluxe_1790149678289.jpg';
-import suyaImg from '../assets/images/nigerian_suya_prawns_1790149701081.jpg';
-import dessertImg from '../assets/images/dish_signature_dessert_1790149152666.jpg';
+import jollofImg from '../assets/images/nigerian_jollof_deluxe_1790149678289.webp';
+import suyaImg from '../assets/images/nigerian_suya_prawns_1790149701081.webp';
+import dessertImg from '../assets/images/dish_signature_dessert_1790149152666.webp';
 
 export const INITIAL_NIGERIAN_MENU: MenuItem[] = [
   // APPETIZERS
