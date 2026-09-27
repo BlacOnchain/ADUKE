@@ -1,4 +1,4 @@
-import { MenuItem, SeatingArea } from '../types/restaurant';
+import { MenuItem, SeatingArea, CustomerReview } from '../types/restaurant';
 import jollofImg from '../assets/images/nigerian_jollof_deluxe_1790149678289.jpg';
 import suyaImg from '../assets/images/nigerian_suya_prawns_1790149701081.jpg';
 import dessertImg from '../assets/images/dish_signature_dessert_1790149152666.jpg';
@@ -306,5 +306,41 @@ export const NIGERIAN_SEATING_AREAS: SeatingArea[] = [
     recommendedFor: 'Private Parties, Corporate Dinners & Milestones',
     tag: 'Private Room',
     totalTables: 2,
+  },
+];
+
+export const INITIAL_REVIEWS: CustomerReview[] = [
+  {
+    id: 'rev-adk-1',
+    author: 'Olumide Jacobs',
+    rating: 5,
+    date: 'Victoria Island, Lagos',
+    title: 'The authentic woodfire jollof is unmatched in Lagos',
+    comment: 'The party-style smoked jollof with melt-in-your-mouth braised oxtail took me straight back to elite Lagos celebrations. Impeccable modern Nigerian aesthetic and rapid table service.',
+    dishRecommended: 'Smoked Firewood Jollof Rice Royale',
+    diningType: 'Dinner',
+    verified: true,
+  },
+  {
+    id: 'rev-adk-2',
+    author: 'Amina Bello',
+    rating: 5,
+    date: 'Ikoyi, Lagos',
+    title: 'Supreme tiger prawns and refreshing Chapman',
+    comment: 'The northern yaji pepper spice on the grilled prawns had the perfect savory punch. Impeccable modern Nigerian aesthetic and wonderful atmosphere.',
+    dishRecommended: 'Tiger Prawn & Beef Suya Platter',
+    diningType: 'Celebration',
+    verified: true,
+  },
+  {
+    id: 'rev-adk-3',
+    author: 'Marcus & Sade Wright',
+    rating: 5,
+    date: 'Lekki Phase 1',
+    title: 'Booked the Palm Veranda for our anniversary',
+    comment: 'Exceptional hospitality from start to finish. The egusi soup with fresh seafood was rich, stone-ground, and flavorful without being overwhelming.',
+    dishRecommended: 'Native Pot Egusi & Fresh Seafood',
+    diningType: 'Dinner',
+    verified: true,
   },
 ];

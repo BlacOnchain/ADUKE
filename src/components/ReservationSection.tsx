@@ -1,21 +1,18 @@
-import React, { useState, useMemo } from 'react';
-import { Calendar, Clock, Users, CheckCircle2, AlertCircle, ArrowRight, ShieldCheck, MapPin } from 'lucide-react';
+import React, { useState } from 'react';
+import { Clock, ShieldCheck, ArrowRight, Check } from 'lucide-react';
 import { SeatingArea, TableReservation } from '../types/restaurant';
-import { restaurantDB } from '../data/db';
 import confetti from 'canvas-confetti';
 
 interface ReservationSectionProps {
   seatingAreas: SeatingArea[];
   preSelectedAreaId?: string;
   onReservationComplete?: (res: TableReservation) => void;
-  onViewDiagram?: () => void;
 }
 
 export const ReservationSection: React.FC<ReservationSectionProps> = ({
   seatingAreas,
   preSelectedAreaId = 'eko-grand',
   onReservationComplete,
-  onViewDiagram,
 }) => {
   // Form State
   const [selectedAreaId, setSelectedAreaId] = useState(preSelectedAreaId);
@@ -41,24 +38,7 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
   const timeSlots = ['5:30 PM', '6:15 PM', '7:00 PM', '7:45 PM', '8:30 PM', '9:15 PM', '10:00 PM'];
 
   // Current selected seating area
-  const selectedArea = useMemo(
-    () => seatingAreas.find((a) => a.id === selectedAreaId) || seatingAreas[0],
-    [seatingAreas, selectedAreaId]
-  );
-
-  // Check real-time slot availability (Double-booking prevention)
-  const slotAvailability = useMemo(() => {
-    return timeSlots.map((time) => {
-      const avail = restaurantDB.checkSlotAvailability(date, time, selectedAreaId);
-      return {
-        time,
-        available: avail.available,
-        remainingTables: avail.remainingTables,
-      };
-    });
-  }, [selectedAreaId, date, timeSlots]);
-
-  const currentSlotStatus = slotAvailability.find((s) => s.time === selectedTimeSlot);
+  const selectedArea = seatingAreas.find((a) => a.id === selectedAreaId) || seatingAreas[0];
 
   const handleBookingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,104 +49,93 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
       return;
     }
 
-    // Validate double booking again before inserting
-    const check = restaurantDB.checkSlotAvailability(date, selectedTimeSlot, selectedAreaId);
-    if (!check.available) {
-      setBookingError(`Apologies, ${selectedArea.name} is fully booked at ${selectedTimeSlot}. Please select another time or atmosphere.`);
-      return;
-    }
-
     setIsSubmitting(true);
 
     setTimeout(() => {
+      const bookingCode = `ADK-${Math.floor(1000 + Math.random() * 9000)}`;
+      const reservation: TableReservation = {
+        id: `res-${Date.now()}`,
+        bookingCode,
+        guestName: guestName.trim(),
+        guestEmail: guestEmail.trim(),
+        guestPhone: guestPhone.trim(),
+        partySize,
+        date,
+        timeSlot: selectedTimeSlot,
+        seatingAreaId: selectedArea.id,
+        seatingAreaName: selectedArea.name,
+        specialRequests: specialRequests.trim() || undefined,
+        occasion,
+        status: 'confirmed',
+        createdAt: new Date().toISOString(),
+      };
+
+      setIsSubmitting(false);
+      setConfirmedReservation(reservation);
+      onReservationComplete?.(reservation);
+
+      // Confetti burst
       try {
-        const result = restaurantDB.createReservation({
-          guestName: guestName.trim(),
-          guestEmail: guestEmail.trim(),
-          guestPhone: guestPhone.trim(),
-          partySize,
-          date,
-          timeSlot: selectedTimeSlot,
-          seatingAreaId: selectedArea.id,
-          seatingAreaName: selectedArea.name,
-          specialRequests: specialRequests.trim() || undefined,
-          occasion,
+        confetti({
+          particleCount: 65,
+          spread: 55,
+          origin: { y: 0.6 },
+          colors: ['#14532D', '#C2410C', '#C89B3C'],
         });
-
-        setIsSubmitting(false);
-
-        if (result.success && result.reservation) {
-          setConfirmedReservation(result.reservation);
-          if (onReservationComplete) onReservationComplete(result.reservation);
-
-          // Confetti burst
-          try {
-            confetti({
-              particleCount: 65,
-              spread: 55,
-              origin: { y: 0.6 },
-              colors: ['#14532D', '#C2410C', '#C89B3C'],
-            });
-          } catch {
-            // ignore
-          }
-        } else {
-          setBookingError(result.error || 'Could not complete reservation.');
-        }
-      } catch (err: any) {
-        setIsSubmitting(false);
-        setBookingError(err.message || 'An error occurred reserving your table.');
+      } catch {
+        // ignore
       }
-    }, 600);
+    }, 400);
   };
 
   const handleBookAnother = () => {
     setConfirmedReservation(null);
     setGuestName('');
     setGuestPhone('');
+    setGuestEmail('');
     setSpecialRequests('');
   };
 
   return (
-    <section id="reservation-section" className="py-24 sm:py-32 bg-[#FAFAF7] text-[#121110] border-t border-[#E8E6DD]">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="reservation-section" className="py-12 sm:py-24 bg-surface-canvas text-ink-primary border-t border-surface-hairline">
+      <div className="max-w-4xl mx-auto px-3.5 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="max-w-2xl mx-auto text-center space-y-3 mb-12">
-          <div className="inline-flex items-center gap-2 text-xs font-bold tracking-wider uppercase text-[#14532D]">
-            <span className="w-2 h-2 rounded-full bg-[#14532D]" />
+        <div className="max-w-2xl mx-auto text-center space-y-2 sm:space-y-3 mb-8 sm:mb-12">
+          <div className="inline-flex items-center gap-2 text-xs font-bold tracking-wider uppercase text-brand-emerald">
+            <span className="w-2 h-2 rounded-full bg-brand-emerald" />
             <span>Table Reservations</span>
           </div>
           <h2 
-            className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#121110]"
+            className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-ink-primary"
             style={{ textWrap: 'balance' }}
           >
             Book your table with us.
           </h2>
-          <p className="text-xs sm:text-base text-[#595852] font-normal leading-relaxed">
+          <p className="text-xs sm:text-sm text-ink-secondary font-normal leading-relaxed">
             Reserve your table in seconds and we'll have your spot and warm hospitality ready when you arrive.
           </p>
         </div>
 
         {/* Successful Digital Reservation Pass View */}
         {confirmedReservation ? (
-          <div className="max-w-xl mx-auto bg-white rounded-3xl border border-[#E8E6DD] shadow-[0_20px_50px_rgba(18,17,16,0.06)] overflow-hidden text-left animate-in fade-in zoom-in-95 duration-400">
+          <div className="max-w-xl mx-auto bg-surface-pure rounded-2xl sm:rounded-3xl border border-surface-hairline shadow-lg overflow-hidden text-left animate-fadeIn">
             
             {/* Top Pass Header */}
-            <div className="p-8 bg-[#14532D] text-white space-y-3 relative overflow-hidden">
+            <div className="p-6 sm:p-8 bg-brand-emerald text-white space-y-2 sm:space-y-3 relative overflow-hidden">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#4ADE80]" />
-                  <span className="text-xs font-mono uppercase tracking-widest text-[#DCFCE7] font-bold">
+                  <span className="text-xs font-mono uppercase tracking-widest text-brand-emerald-light font-bold">
                     Reservation Confirmed
                   </span>
                 </div>
-                <span className="font-mono text-sm font-bold tracking-wider bg-black/20 px-3 py-1 rounded-lg">
+                <span className="font-mono text-xs sm:text-sm font-bold tracking-wider bg-black/20 px-2.5 py-1 rounded-lg">
                   {confirmedReservation.bookingCode}
                 </span>
               </div>
 
-              <h3 className="font-display text-3xl font-bold text-white">
+              <h3 className="font-display text-2xl sm:text-3xl font-bold text-white">
                 Àdùkẹ́ Gastronomy
               </h3>
 
@@ -176,47 +145,47 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
             </div>
 
             {/* Pass Body Content */}
-            <div className="p-8 space-y-6">
-              <div className="grid grid-cols-2 gap-6 pb-6 border-b border-[#E8E6DD] text-xs">
+            <div className="p-5 sm:p-8 space-y-5 sm:space-y-6">
+              <div className="grid grid-cols-2 gap-4 sm:gap-6 pb-5 sm:pb-6 border-b border-surface-hairline text-xs">
                 <div>
-                  <span className="text-[#8C8A82] block text-[11px] uppercase tracking-wider font-medium">Guest Name</span>
-                  <span className="font-bold text-sm text-[#121110] mt-0.5 block">{confirmedReservation.guestName}</span>
+                  <span className="text-ink-muted block text-[10px] sm:text-[11px] uppercase tracking-wider font-medium">Guest Name</span>
+                  <span className="font-bold text-sm text-ink-primary mt-0.5 block truncate">{confirmedReservation.guestName}</span>
                 </div>
                 <div>
-                  <span className="text-[#8C8A82] block text-[11px] uppercase tracking-wider font-medium">Party Size</span>
-                  <span className="font-mono font-bold text-sm text-[#121110] mt-0.5 block">{confirmedReservation.partySize} Guests</span>
+                  <span className="text-ink-muted block text-[10px] sm:text-[11px] uppercase tracking-wider font-medium">Party Size</span>
+                  <span className="font-mono font-bold text-sm text-ink-primary mt-0.5 block">{confirmedReservation.partySize} Guests</span>
                 </div>
                 <div>
-                  <span className="text-[#8C8A82] block text-[11px] uppercase tracking-wider font-medium">Date & Sitting</span>
-                  <span className="font-mono font-bold text-sm text-[#14532D] mt-0.5 block">
+                  <span className="text-ink-muted block text-[10px] sm:text-[11px] uppercase tracking-wider font-medium">Date & Sitting</span>
+                  <span className="font-mono font-bold text-sm text-brand-emerald mt-0.5 block">
                     {confirmedReservation.date} · {confirmedReservation.timeSlot}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[#8C8A82] block text-[11px] uppercase tracking-wider font-medium">Seating Pavilion</span>
-                  <span className="font-bold text-sm text-[#121110] mt-0.5 block">{confirmedReservation.seatingAreaName}</span>
+                  <span className="text-ink-muted block text-[10px] sm:text-[11px] uppercase tracking-wider font-medium">Seating Area</span>
+                  <span className="font-bold text-sm text-ink-primary mt-0.5 block truncate">{confirmedReservation.seatingAreaName}</span>
                 </div>
               </div>
 
               {confirmedReservation.specialRequests && (
-                <div className="text-xs space-y-1 bg-[#FAFAF7] p-4 rounded-xl border border-[#E8E6DD]">
-                  <span className="font-semibold text-[#121110]">Kitchen & Allergen Notes:</span>
-                  <p className="text-[#595852] italic">{confirmedReservation.specialRequests}</p>
+                <div className="text-xs space-y-1 bg-surface-canvas p-3.5 rounded-xl border border-surface-hairline">
+                  <span className="font-semibold text-ink-primary">Kitchen & Allergen Notes:</span>
+                  <p className="text-ink-secondary italic">{confirmedReservation.specialRequests}</p>
                 </div>
               )}
 
-              <div className="flex items-center gap-3 text-xs text-[#595852] pt-2">
-                <ShieldCheck className="w-4 h-4 text-[#14532D] shrink-0" />
+              <div className="flex items-center gap-2.5 text-xs text-ink-secondary">
+                <ShieldCheck className="w-4 h-4 text-brand-emerald shrink-0" />
                 <span>
-                  Tables are held for 15 minutes past reservation time. Executive valet service welcomes you at the Adeola Odeku entrance.
+                  Tables held for 15 mins. Free valet parking on Adeola Odeku.
                 </span>
               </div>
 
-              <div className="pt-4 flex items-center justify-between gap-4">
+              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="px-4 py-2.5 text-xs font-semibold text-[#121110] bg-[#FAFAF7] hover:bg-[#F4F3ED] border border-[#E8E6DD] rounded-xl transition-colors cursor-pointer"
+                  className="px-4 py-2.5 text-xs font-semibold text-ink-primary bg-surface-canvas hover:bg-surface-muted border border-surface-hairline rounded-xl transition-colors cursor-pointer text-center"
                 >
                   Print / Save Pass
                 </button>
@@ -224,7 +193,7 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                 <button
                   type="button"
                   onClick={handleBookAnother}
-                  className="px-5 py-2.5 bg-[#14532D] hover:bg-[#0D3823] text-white text-xs font-semibold rounded-xl transition-all shadow-xs cursor-pointer"
+                  className="px-5 py-2.5 bg-brand-emerald hover:bg-brand-emerald-dark text-white text-xs font-semibold rounded-xl transition-all shadow-xs cursor-pointer text-center"
                 >
                   Make Another Reservation
                 </button>
@@ -233,25 +202,27 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
 
           </div>
         ) : (
-          /* Human-Crafted Concierge Booking Form — No Nested AI Box Clutter */
+          /* Mobile-Optimized Sleek Rectangular Booking Container */
           <form
             onSubmit={handleBookingSubmit}
-            className="bg-white rounded-3xl border border-[#E8E6DD] shadow-[0_16px_40px_rgba(18,17,16,0.04)] p-8 sm:p-12 space-y-10 text-left"
+            className="bg-surface-pure rounded-2xl sm:rounded-3xl border border-surface-hairline shadow-sm p-4 sm:p-8 lg:p-10 space-y-7 sm:space-y-9 text-left"
           >
             {/* Step 1: Seating Area Selection */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-display text-lg sm:text-xl font-bold text-[#121110]">
-                    1. Choose Seating Area
-                  </h3>
-                  <p className="text-xs text-[#595852] mt-0.5">
-                    Select where you'd like your table set.
-                  </p>
-                </div>
+            <div className="space-y-3 sm:space-y-4">
+              <div>
+                <h3 className="font-display text-base sm:text-xl font-bold text-ink-primary flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-brand-emerald text-white text-[11px] font-mono font-bold flex items-center justify-center shrink-0">
+                    1
+                  </span>
+                  <span>Choose Seating Area</span>
+                </h3>
+                <p className="text-xs text-ink-secondary mt-0.5 ml-7">
+                  Select where you'd like your table prepared.
+                </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {/* Responsive Rectangular Cards Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
                 {seatingAreas.map((area) => {
                   const isSelected = selectedAreaId === area.id;
                   return (
@@ -259,27 +230,37 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                       key={area.id}
                       type="button"
                       onClick={() => setSelectedAreaId(area.id)}
-                      className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                      className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left transition-all cursor-pointer flex flex-row sm:flex-col justify-between items-center sm:items-start gap-3 ${
                         isSelected
-                          ? 'border-[#14532D] bg-[#DCFCE7]/40 ring-1 ring-[#14532D]'
-                          : 'border-[#E8E6DD] bg-[#FAFAF7] hover:bg-white'
+                          ? 'border-brand-emerald bg-brand-emerald-light/40 ring-1 ring-brand-emerald shadow-2xs'
+                          : 'border-surface-hairline bg-surface-canvas hover:bg-surface-pure hover:border-brand-emerald/30'
                       }`}
                     >
-                      <div className="space-y-1">
-                        <span className="text-[10px] uppercase font-mono tracking-wider text-[#8C8A82]">
+                      <div className="space-y-1 min-w-0 flex-1">
+                        <span className="text-[10px] uppercase font-mono tracking-wider text-brand-emerald font-bold">
                           {area.capacity}
                         </span>
-                        <h4 className="font-display text-sm font-bold text-[#121110]">
+                        <h4 className="font-display text-sm font-bold text-ink-primary truncate">
                           {area.name}
                         </h4>
-                        <p className="text-xs text-[#595852] line-clamp-2">
+                        <p className="text-[11px] text-ink-secondary line-clamp-1 sm:line-clamp-2">
                           {area.description}
                         </p>
                       </div>
 
-                      <div className="pt-3 mt-3 border-t border-[#E8E6DD]/60 flex items-center justify-between text-[11px] font-mono">
-                        <span className="text-[#14532D] font-bold">{area.totalTables} tables</span>
-                        {isSelected && <span className="text-[#14532D] font-bold">✓ Selected</span>}
+                      <div className="shrink-0 flex sm:w-full sm:pt-2 sm:mt-1 sm:border-t sm:border-surface-hairline items-center justify-end sm:justify-between text-[11px] font-mono">
+                        <span className="hidden sm:inline text-ink-muted">
+                          {area.totalTables} tables
+                        </span>
+                        <div
+                          className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${
+                            isSelected
+                              ? 'bg-brand-emerald text-white'
+                              : 'border border-surface-hairline bg-surface-pure'
+                          }`}
+                        >
+                          {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
+                        </div>
                       </div>
                     </button>
                   );
@@ -287,41 +268,45 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
               </div>
             </div>
 
-            {/* Step 2: Date, Party Size & Sittings */}
-            <div className="space-y-6 pt-6 border-t border-[#E8E6DD]">
-              <h3 className="font-display text-lg sm:text-xl font-bold text-[#121110]">
-                2. Date, Time & Number of Guests
-              </h3>
+            {/* Step 2: Date, Party Size & Time Slots */}
+            <div className="space-y-4 sm:space-y-5 pt-5 sm:pt-7 border-t border-surface-hairline">
+              <div>
+                <h3 className="font-display text-base sm:text-xl font-bold text-ink-primary flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-brand-emerald text-white text-[11px] font-mono font-bold flex items-center justify-center shrink-0">
+                    2
+                  </span>
+                  <span>Date, Time & Number of Guests</span>
+                </h3>
+              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+              {/* Date, Guests, Occasion Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-xs">
                 {/* Date Picker */}
-                <div className="space-y-1.5">
-                  <label htmlFor="res-date" className="block font-semibold text-[#121110]">
+                <div className="space-y-1">
+                  <label htmlFor="res-date" className="block font-semibold text-ink-primary text-xs">
                     Date *
                   </label>
-                  <div className="relative">
-                    <input
-                      id="res-date"
-                      type="date"
-                      min={new Date().toISOString().split('T')[0]}
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-[#FAFAF7] border border-[#E8E6DD] rounded-xl text-[#121110] focus:outline-none focus:border-[#14532D] font-mono"
-                      required
-                    />
-                  </div>
+                  <input
+                    id="res-date"
+                    type="date"
+                    min={new Date().toISOString().split('T')[0]}
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    className="w-full h-11 px-3.5 bg-surface-pure border border-surface-hairline rounded-xl text-ink-primary focus:outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald font-mono text-xs cursor-pointer shadow-2xs"
+                    required
+                  />
                 </div>
 
                 {/* Party Size */}
-                <div className="space-y-1.5">
-                  <label htmlFor="res-party-size" className="block font-semibold text-[#121110]">
+                <div className="space-y-1">
+                  <label htmlFor="res-party-size" className="block font-semibold text-ink-primary text-xs">
                     Number of Guests *
                   </label>
                   <select
                     id="res-party-size"
                     value={partySize}
                     onChange={(e) => setPartySize(Number(e.target.value))}
-                    className="w-full px-3.5 py-2.5 bg-[#FAFAF7] border border-[#E8E6DD] rounded-xl text-[#121110] focus:outline-none focus:border-[#14532D] font-mono"
+                    className="w-full h-11 px-3.5 bg-surface-pure border border-surface-hairline rounded-xl text-ink-primary focus:outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald font-mono text-xs cursor-pointer shadow-2xs"
                   >
                     {[1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14].map((num) => (
                       <option key={num} value={num}>
@@ -332,15 +317,15 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                 </div>
 
                 {/* Occasion */}
-                <div className="space-y-1.5">
-                  <label htmlFor="res-occasion" className="block font-semibold text-[#121110]">
+                <div className="space-y-1">
+                  <label htmlFor="res-occasion" className="block font-semibold text-ink-primary text-xs">
                     Occasion
                   </label>
                   <select
                     id="res-occasion"
                     value={occasion}
                     onChange={(e) => setOccasion(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-[#FAFAF7] border border-[#E8E6DD] rounded-xl text-[#121110] focus:outline-none focus:border-[#14532D]"
+                    className="w-full h-11 px-3.5 bg-surface-pure border border-surface-hairline rounded-xl text-ink-primary focus:outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald text-xs cursor-pointer shadow-2xs"
                   >
                     <option value="Dinner Service">Dinner</option>
                     <option value="Birthday Celebration">Birthday</option>
@@ -352,35 +337,38 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
               </div>
 
               {/* Time Slot Selection */}
-              <div className="space-y-2">
-                <span className="block text-xs font-semibold text-[#121110]">
-                  Select Time
-                </span>
+              <div className="space-y-2 pt-1">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-ink-primary">
+                    Select Sitting Time
+                  </span>
+                  <span className="text-[11px] text-ink-secondary">
+                    Available slots for {date}
+                  </span>
+                </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-                  {slotAvailability.map((slot) => {
-                    const isSelected = selectedTimeSlot === slot.time;
-                    const isSoldOut = !slot.available;
+                <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-1.5 sm:gap-2">
+                  {timeSlots.map((time) => {
+                    const isSelected = selectedTimeSlot === time;
 
                     return (
                       <button
-                        key={slot.time}
+                        key={time}
                         type="button"
-                        disabled={isSoldOut}
-                        onClick={() => setSelectedTimeSlot(slot.time)}
-                        className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
+                        onClick={() => setSelectedTimeSlot(time)}
+                        className={`py-2 px-1.5 sm:py-2.5 sm:px-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center min-h-[44px] ${
                           isSelected
-                            ? 'border-[#14532D] bg-[#14532D] text-white shadow-xs'
-                            : isSoldOut
-                            ? 'border-[#E8E6DD] bg-[#F4F3ED] text-[#A8A69E] cursor-not-allowed opacity-50'
-                            : 'border-[#E8E6DD] bg-[#FAFAF7] hover:bg-white text-[#121110]'
+                            ? 'border-brand-emerald bg-brand-emerald text-white shadow-xs'
+                            : 'border-surface-hairline bg-surface-pure hover:bg-surface-muted text-ink-primary shadow-2xs'
                         }`}
                       >
-                        <span className="font-mono text-xs font-bold block">{slot.time}</span>
-                        <span className={`text-[10px] block mt-1 font-mono ${
-                          isSelected ? 'text-[#DCFCE7]' : isSoldOut ? 'text-[#A8A69E]' : 'text-[#14532D]'
+                        <span className="font-mono text-xs font-bold leading-tight block">
+                          {time}
+                        </span>
+                        <span className={`text-[9px] sm:text-[10px] block font-mono mt-0.5 ${
+                          isSelected ? 'text-brand-emerald-light' : 'text-brand-emerald'
                         }`}>
-                          {isSoldOut ? 'Full' : `${slot.remainingTables} left`}
+                          Available
                         </span>
                       </button>
                     );
@@ -390,14 +378,21 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
             </div>
 
             {/* Step 3: Guest Contact & Dietary Requests */}
-            <div className="space-y-4 pt-6 border-t border-[#E8E6DD]">
-              <h3 className="font-display text-xl font-bold text-[#121110]">
-                3. Primary Guest Details
-              </h3>
+            <div className="space-y-4 pt-5 sm:pt-7 border-t border-surface-hairline">
+              <div>
+                <h3 className="font-display text-base sm:text-xl font-bold text-ink-primary flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-brand-emerald text-white text-[11px] font-mono font-bold flex items-center justify-center shrink-0">
+                    3
+                  </span>
+                  <span>Primary Guest Details</span>
+                </h3>
+              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-                <div className="space-y-1.5">
-                  <label htmlFor="res-guest-name" className="block font-semibold text-[#121110]">Full Name *</label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-xs">
+                <div className="space-y-1">
+                  <label htmlFor="res-guest-name" className="block font-semibold text-ink-primary text-xs">
+                    Full Name *
+                  </label>
                   <input
                     id="res-guest-name"
                     required
@@ -405,12 +400,14 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                     placeholder="e.g. Oluwaseun Adeleke"
                     value={guestName}
                     onChange={(e) => setGuestName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-[#FAFAF7] border border-[#E8E6DD] rounded-xl text-[#121110] focus:outline-none focus:border-[#14532D]"
+                    className="w-full h-11 px-3.5 bg-surface-pure border border-surface-hairline rounded-xl text-ink-primary text-xs focus:outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald shadow-2xs"
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label htmlFor="res-guest-phone" className="block font-semibold text-[#121110]">Nigerian / International Mobile *</label>
+                <div className="space-y-1">
+                  <label htmlFor="res-guest-phone" className="block font-semibold text-ink-primary text-xs">
+                    Mobile Phone *
+                  </label>
                   <input
                     id="res-guest-phone"
                     required
@@ -418,12 +415,14 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                     placeholder="+234 803 123 4567"
                     value={guestPhone}
                     onChange={(e) => setGuestPhone(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-[#FAFAF7] border border-[#E8E6DD] rounded-xl text-[#121110] focus:outline-none focus:border-[#14532D]"
+                    className="w-full h-11 px-3.5 bg-surface-pure border border-surface-hairline rounded-xl text-ink-primary text-xs focus:outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald shadow-2xs"
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label htmlFor="res-guest-email" className="block font-semibold text-[#121110]">Email Confirmation *</label>
+                <div className="space-y-1">
+                  <label htmlFor="res-guest-email" className="block font-semibold text-ink-primary text-xs">
+                    Email Confirmation *
+                  </label>
                   <input
                     id="res-guest-email"
                     required
@@ -431,47 +430,45 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                     placeholder="guest@example.com"
                     value={guestEmail}
                     onChange={(e) => setGuestEmail(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-[#FAFAF7] border border-[#E8E6DD] rounded-xl text-[#121110] focus:outline-none focus:border-[#14532D]"
+                    className="w-full h-11 px-3.5 bg-surface-pure border border-surface-hairline rounded-xl text-ink-primary text-xs focus:outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald shadow-2xs"
                   />
                 </div>
               </div>
 
-              <div className="space-y-1.5 text-xs">
-                <label htmlFor="res-notes" className="block font-semibold text-[#121110]">
-                  Dietary Restrictions, Allergens or Seating Requests (Optional)
+              <div className="space-y-1 text-xs">
+                <label htmlFor="res-notes" className="block font-semibold text-ink-primary text-xs">
+                  Dietary Restrictions or Special Requests (Optional)
                 </label>
                 <textarea
                   id="res-notes"
                   rows={2}
-                  placeholder="e.g., Shellfish allergy, birthday dessert sparkler, quiet banquette preferred..."
+                  placeholder="e.g., Shellfish allergy, birthday celebration, quiet banquette preferred..."
                   value={specialRequests}
                   onChange={(e) => setSpecialRequests(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-[#FAFAF7] border border-[#E8E6DD] rounded-xl text-[#121110] focus:outline-none focus:border-[#14532D]"
+                  className="w-full p-3 bg-surface-pure border border-surface-hairline rounded-xl text-ink-primary text-xs focus:outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald shadow-2xs resize-none"
                 />
               </div>
             </div>
 
-            {/* Error Message */}
             {bookingError && (
-              <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
+              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs">
                 <span>{bookingError}</span>
               </div>
             )}
 
             {/* Submit Action Bar */}
-            <div className="pt-6 border-t border-[#E8E6DD] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="text-xs text-[#595852] flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-[#14532D]" />
+            <div className="pt-4 sm:pt-6 border-t border-surface-hairline flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+              <div className="text-xs text-ink-secondary flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-brand-emerald shrink-0" />
                 <span>No cancellation fee when modified 4+ hours prior.</span>
               </div>
 
               <button
                 type="submit"
-                disabled={isSubmitting || !currentSlotStatus?.available}
-                className="px-8 py-3.5 bg-[#14532D] hover:bg-[#0D3823] disabled:opacity-50 text-white text-xs font-semibold uppercase tracking-wider rounded-xl transition-all shadow-md shadow-emerald-950/15 flex items-center justify-center gap-2 cursor-pointer"
+                disabled={isSubmitting}
+                className="btn-interactive w-full sm:w-auto px-6 sm:px-8 py-3.5 bg-brand-emerald hover:bg-brand-emerald-dark disabled:opacity-50 text-white text-xs sm:text-sm font-semibold uppercase tracking-wider rounded-xl transition-all shadow-md shadow-emerald-950/15 flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
               >
-                <span>{isSubmitting ? 'Confirming with Host Stand...' : 'Confirm Table Reservation'}</span>
+                <span>{isSubmitting ? 'Confirming Reservation...' : 'Confirm Table Reservation'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

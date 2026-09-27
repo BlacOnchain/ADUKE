@@ -1,31 +1,37 @@
 # Àdùkẹ́ — Modern Nigerian Gastronomy 🪵🔥
 
-Contemporary Nigerian fine dining web application located in Victoria Island, Lagos. Built for immersive culinary discovery, woodfire hearth ordering, table reservations, and real-time order tracking.
+A modern, static portfolio demonstration site for **Àdùkẹ́**, a contemporary Nigerian fine-dining restaurant concept in Victoria Island, Lagos.
+
+This project is a standalone, client-only web demo built to showcase rich frontend craftsmanship, refined editorial typography, responsive layouts, interactive dish customization, and dining table reservation flows.
+
+> **Note**: This is a static portfolio demo. There is no live backend, no staff console, and no real payment processing. All cart additions, checkout confirmations, and table bookings are handled locally within client React state.
 
 ---
 
-## ✨ Features & Architecture
+## ✨ Demo Highlights
 
-- **Culinary Menu & Live Ordering**: Categorized Nigerian delicacies (Smoked Party Jollof Royale, Suya Prawns, Palm Wine cocktails) with interactive dish customization.
-- **Table QR Code Sessions**: Dine-in guests scan table QR codes to link their active table session directly to the kitchen display system (KDS).
-- **Authenticated Order History Dashboard**: Secure dashboard for guests to view past orders in a timeline format, inspect itemized ₦ VAT receipts, and reorder favorites in 1 click.
-- **Table Reservation System**: Double-booking prevention system across 12 seating zones (Eko Grand Pavilion, Palm Terrace, VIP Ooni Lounge).
-- **Executive Staff Dashboard**: 5-tier role-based management console (Owner, Head Chef, Waiter, Cashier, Delivery Dispatch) with live revenue analytics powered by Recharts.
-- **Real-Time Google Maps Transit Agent**: Live directions and transit routing to Adeola Odeku, Victoria Island.
+- **Authentic Culinary Menu**: Categorized Nigerian delicacies (Firewood Party Jollof, Tiger Prawn Suya, Braised Oxtail Efo Riro, Fresh Palm Wine Sangria) with interactive options and dietary filters.
+- **Interactive Dish Modal**: Detailed dish view with ingredient stories, allergen tags, calorie counts, chef notes, and add-on customizers.
+- **Client-Side Dining Bag & Checkout**: Local cart management with live quantity updates, 7.5% Nigerian VAT calculations, optional courier/pickup toggles, and celebratory confetti confirmations.
+- **Table Reservation Form**: Mobile-optimized, touch-friendly booking experience with atmosphere selection (The Eko Grand Dining Hall, Danfo Hearth & Bar, Lagos Palm Veranda, Oba’s Suite), date/party-size pickers, and instant digital reservation passes.
+- **Our Story & Guestbook**: Editorial storytelling celebrating Lagos woodfire heritage alongside an interactive guest review submission drawer.
+- **Domain-Tailored Aesthetics**: Royal Palm Emerald (`#14532D`), Warm Terracotta (`#C2410C`), Antique Brass (`#C89B3C`), and Stone Canvas (`#FAFAF7`) typography and color palette.
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React 19, TypeScript, Vite
-- **Styling**: Tailwind CSS (natural earthy Nigerian palette: forest green `#14532D`, terracotta `#C2410C`, brass `#C89B3C`, stone `#FAFAF7`)
-- **Icons**: Lucide React
-- **Analytics**: Recharts
-- **Database & Auth**: Firebase / Local persistent fallback
+- **Framework**: React 19, TypeScript
+- **Bundler & Tooling**: Vite
+- **Styling**: Tailwind CSS v4 with custom theme tokens
+- **Typography**: Playfair Display (Serif), Plus Jakarta Sans, JetBrains Mono
+- **Icons & Microinteractions**: Lucide React, Canvas Confetti
 
 ---
 
 ## 🚀 Getting Started Locally
+
+Zero external services, database instances, or API keys are required to run this project.
 
 1. **Clone the repository**:
    ```bash
@@ -38,17 +44,19 @@ Contemporary Nigerian fine dining web application located in Victoria Island, La
    npm install
    ```
 
-3. **Run development server**:
+3. **Start the development server**:
    ```bash
    npm run dev
    ```
+   Open your browser to `http://localhost:3000`.
 
-4. **Build for production**:
+4. **Build and preview production static bundle**:
    ```bash
    npm run build
+   npm run preview
    ```
 
 ---
 
 ## 🌐 Live Demo
-Visit the live website: [https://blaconchain.github.io/ADUKE/](https://blaconchain.github.io/ADUKE/)
+Experience the live site: [https://blaconchain.github.io/ADUKE/](https://blaconchain.github.io/ADUKE/)

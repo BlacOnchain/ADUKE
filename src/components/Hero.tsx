@@ -4,7 +4,6 @@ import {
   Utensils,
   MapPin,
   Clock,
-  Flame,
 } from 'lucide-react';
 import heroImg from '../assets/images/hero_nigerian_restaurant_1790149661135.jpg';
 import jollofImg from '../assets/images/nigerian_jollof_deluxe_1790149678289.jpg';
@@ -21,7 +20,7 @@ export const Hero: React.FC<HeroProps> = ({
   onExploreMenu,
 }) => {
   return (
-    <section className="relative overflow-hidden pt-8 pb-14 sm:pt-14 sm:pb-20 bg-[#FAFAF7] text-[#121110]">
+    <section className="relative overflow-hidden pt-8 pb-14 sm:pt-14 sm:pb-20 bg-surface-canvas text-ink-primary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Main 2-Column Hero */}
@@ -30,20 +29,20 @@ export const Hero: React.FC<HeroProps> = ({
           {/* Left Column: Welcoming Human Narrative */}
           <div className="lg:col-span-6 space-y-5 text-left">
             
-            {/* Clean, authentic restaurant badge — No AI sparkle logo */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#DCFCE7] text-[#14532D] text-xs font-semibold">
-              <span className="w-2 h-2 rounded-full bg-[#14532D] animate-pulse" />
+            {/* Clean, authentic restaurant badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-emerald-light text-brand-emerald text-xs font-semibold">
+              <span className="w-2 h-2 rounded-full bg-brand-emerald animate-pulse" />
               <span>Victoria Island, Lagos · Open Hearth Dining</span>
             </div>
 
             <h1 
-              className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#121110] leading-[1.12]"
+              className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-ink-primary leading-[1.12]"
               style={{ textWrap: 'balance' }}
             >
               Real Nigerian cooking, made over open woodfire.
             </h1>
 
-            <p className="text-base sm:text-lg text-[#595852] font-normal leading-relaxed">
+            <p className="text-base sm:text-lg text-ink-secondary font-normal leading-relaxed">
               We slow-cook our food with real firewood embers, fresh native herbs, and genuine Lagos hospitality. Come share smoky party jollof, tender braised oxtail, chargrilled suya, and chilled drinks with family and friends.
             </p>
 
@@ -51,7 +50,7 @@ export const Hero: React.FC<HeroProps> = ({
             <div className="pt-2 flex flex-wrap items-center gap-3">
               <button
                 onClick={onBookTable}
-                className="btn-interactive px-6 py-3.5 bg-[#14532D] hover:bg-[#0D3823] text-white text-xs sm:text-sm font-semibold rounded-xl shadow-md shadow-emerald-950/15 flex items-center gap-2 cursor-pointer"
+                className="btn-interactive px-6 py-3.5 bg-brand-emerald hover:bg-brand-emerald-dark text-white text-xs sm:text-sm font-semibold rounded-xl shadow-md shadow-emerald-950/15 flex items-center gap-2 cursor-pointer"
               >
                 <Utensils className="w-4 h-4" />
                 <span>Reserve a Table</span>
@@ -59,25 +58,25 @@ export const Hero: React.FC<HeroProps> = ({
 
               <button
                 onClick={onExploreMenu}
-                className="btn-interactive px-5 py-3.5 bg-white hover:bg-[#F4F3ED] text-[#121110] text-xs sm:text-sm font-semibold rounded-xl border border-[#E8E6DD] flex items-center gap-2 cursor-pointer shadow-2xs"
+                className="btn-interactive px-5 py-3.5 bg-surface-pure hover:bg-surface-muted text-ink-primary text-xs sm:text-sm font-semibold rounded-xl border border-surface-hairline flex items-center gap-2 cursor-pointer shadow-2xs"
               >
                 <span>View Menu</span>
-                <ArrowRight className="w-4 h-4 text-[#14532D]" />
+                <ArrowRight className="w-4 h-4 text-brand-emerald" />
               </button>
             </div>
 
             {/* Simple Human Highlights Strip */}
-            <div className="pt-4 border-t border-[#E8E6DD] flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-[#595852]">
-              <span className="flex items-center gap-1.5 font-medium text-[#121110]">
-                <MapPin className="w-3.5 h-3.5 text-[#14532D]" />
+            <div className="pt-4 border-t border-surface-hairline flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-ink-secondary">
+              <span className="flex items-center gap-1.5 font-medium text-ink-primary">
+                <MapPin className="w-3.5 h-3.5 text-brand-emerald" />
                 14 Adeola Odeku, VI
               </span>
-              <span aria-hidden="true" className="text-[#8C8A82]">·</span>
+              <span aria-hidden="true" className="text-ink-muted">·</span>
               <span className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-[#14532D]" />
+                <Clock className="w-3.5 h-3.5 text-brand-emerald" />
                 Open Tuesday – Sunday
               </span>
-              <span aria-hidden="true" className="text-[#8C8A82]">·</span>
+              <span aria-hidden="true" className="text-ink-muted">·</span>
               <span>Free Valet Parking</span>
             </div>
 
@@ -86,7 +85,7 @@ export const Hero: React.FC<HeroProps> = ({
           {/* Right Column: Clean, Elegant Single Visual Showcase */}
           <div className="lg:col-span-6 animate-fade-scale">
             <TiltCard maxTilt={4} scale={1.01} className="rounded-3xl">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-[#E8E6DD] bg-[#121110]">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-surface-hairline bg-ink-primary">
                 {/* Main Hero Photo */}
                 <div className="aspect-[4/3] sm:aspect-[16/11] relative overflow-hidden group">
                   <img
@@ -118,10 +117,10 @@ export const Hero: React.FC<HeroProps> = ({
                 </div>
 
                 {/* Simple 2-photo preview bar below */}
-                <div className="grid grid-cols-2 p-3 bg-white gap-2 border-t border-[#E8E6DD]">
+                <div className="grid grid-cols-2 p-3 bg-surface-pure gap-2 border-t border-surface-hairline">
                   <div 
                     onClick={onExploreMenu}
-                    className="flex items-center gap-2.5 p-2 rounded-xl bg-[#FAFAF7] hover:bg-[#F4F3ED] transition-colors cursor-pointer text-left"
+                    className="flex items-center gap-2.5 p-2 rounded-xl bg-surface-canvas hover:bg-surface-muted transition-colors cursor-pointer text-left"
                   >
                     <img
                       src={jollofImg}
@@ -129,14 +128,14 @@ export const Hero: React.FC<HeroProps> = ({
                       className="w-10 h-10 rounded-lg object-cover"
                     />
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-[#121110] truncate">Party Jollof</p>
-                      <p className="text-[11px] text-[#14532D] font-medium">Woodfire smoked</p>
+                      <p className="text-xs font-bold text-ink-primary truncate">Party Jollof</p>
+                      <p className="text-[11px] text-brand-emerald font-medium">Woodfire smoked</p>
                     </div>
                   </div>
 
                   <div 
                     onClick={onExploreMenu}
-                    className="flex items-center gap-2.5 p-2 rounded-xl bg-[#FAFAF7] hover:bg-[#F4F3ED] transition-colors cursor-pointer text-left"
+                    className="flex items-center gap-2.5 p-2 rounded-xl bg-surface-canvas hover:bg-surface-muted transition-colors cursor-pointer text-left"
                   >
                     <img
                       src={suyaImg}
@@ -144,8 +143,8 @@ export const Hero: React.FC<HeroProps> = ({
                       className="w-10 h-10 rounded-lg object-cover"
                     />
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-[#121110] truncate">Tiger Prawn Suya</p>
-                      <p className="text-[11px] text-[#C2410C] font-medium">Charcoal grilled</p>
+                      <p className="text-xs font-bold text-ink-primary truncate">Tiger Prawn Suya</p>
+                      <p className="text-[11px] text-brand-terracotta font-medium">Charcoal grilled</p>
                     </div>
                   </div>
                 </div>
@@ -157,22 +156,22 @@ export const Hero: React.FC<HeroProps> = ({
         </div>
 
         {/* Lower Simple Hospitality Strip */}
-        <div className="mt-12 pt-6 border-t border-[#E8E6DD] grid grid-cols-2 sm:grid-cols-4 gap-4 text-left">
+        <div className="mt-12 pt-6 border-t border-surface-hairline grid grid-cols-2 sm:grid-cols-4 gap-4 text-left">
           <div className="space-y-0.5">
-            <p className="font-display text-lg sm:text-xl font-bold text-[#121110]">Woodfire Hearth</p>
-            <p className="text-xs text-[#595852]">Cooked over seasoned oak embers</p>
+            <p className="font-display text-lg sm:text-xl font-bold text-ink-primary">Woodfire Hearth</p>
+            <p className="text-xs text-ink-secondary">Cooked over seasoned oak embers</p>
           </div>
           <div className="space-y-0.5">
-            <p className="font-display text-lg sm:text-xl font-bold text-[#14532D]">Fresh Ingredients</p>
-            <p className="text-xs text-[#595852]">Stone-ground native spices & herbs</p>
+            <p className="font-display text-lg sm:text-xl font-bold text-brand-emerald">Fresh Ingredients</p>
+            <p className="text-xs text-ink-secondary">Stone-ground native spices & herbs</p>
           </div>
           <div className="space-y-0.5">
-            <p className="font-display text-lg sm:text-xl font-bold text-[#C2410C]">Charcoal Grill</p>
-            <p className="text-xs text-[#595852]">Northern yaji spiced suya skewers</p>
+            <p className="font-display text-lg sm:text-xl font-bold text-brand-terracotta">Charcoal Grill</p>
+            <p className="text-xs text-ink-secondary">Northern yaji spiced suya skewers</p>
           </div>
           <div className="space-y-0.5">
-            <p className="font-display text-lg sm:text-xl font-bold text-[#C89B3C]">Fresh Drinks</p>
-            <p className="text-xs text-[#595852]">Fresh palm wine, zobo & chapman</p>
+            <p className="font-display text-lg sm:text-xl font-bold text-brand-brass">Fresh Drinks</p>
+            <p className="text-xs text-ink-secondary">Fresh palm wine, zobo & chapman</p>
           </div>
         </div>
 

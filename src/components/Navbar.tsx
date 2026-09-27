@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Utensils, User, LogOut, Menu, X, QrCode, Bell, Phone, Mail, Shield } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { RestaurantOrder, TableSession, formatNaira } from '../types/restaurant';
-import { notificationService } from '../services/notificationService';
+import React, { useState } from 'react';
+import { ShoppingBag, Utensils, Menu, X, Phone } from 'lucide-react';
+import { formatNaira } from '../types/restaurant';
 
 interface NavbarProps {
   activeSection: string;
@@ -12,15 +9,6 @@ interface NavbarProps {
   cartTotal: number;
   onOpenCart: () => void;
   onOpenReservation: () => void;
-  onOpenScanQR: () => void;
-  onOpenNotifications: () => void;
-  activeTableSession?: TableSession | null;
-  activeOrder?: RestaurantOrder;
-  onOpenTracker?: () => void;
-  isStaffMode: boolean;
-  onToggleStaffMode: () => void;
-  onOpenAuth: () => void;
-  onOpenMenuManager: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -30,31 +18,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   cartTotal,
   onOpenCart,
   onOpenReservation,
-  onOpenScanQR,
-  onOpenNotifications,
-  activeTableSession,
-  activeOrder,
-  onOpenTracker,
-  onOpenAuth,
 }) => {
-  const { currentUser, logout } = useAuth();
-  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [hasUnread, setHasUnread] = useState(false);
-
-  useEffect(() => {
-    const checkUnread = () => {
-      const history = notificationService.getHistory();
-      setHasUnread(history.some((h) => !h.read));
-    };
-    checkUnread();
-    const unsub = notificationService.subscribe(checkUnread);
-    return () => unsub();
-  }, []);
 
   const navLinks = [
     { id: 'menu', label: 'Culinary Menu' },
-    { id: 'order-history', label: 'Order History' },
     { id: 'reservation', label: 'Reservations' },
     { id: 'story', label: 'Our Story' },
     { id: 'reviews', label: 'Reviews' },
@@ -66,7 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#FAFAF7]/95 backdrop-blur-md border-b border-[#E8E6DD]/80 transition-all">
+    <header className="sticky top-0 z-40 bg-surface-canvas/95 backdrop-blur-md border-b border-surface-hairline/80 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           
@@ -77,31 +45,31 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="text-left group flex items-baseline gap-2 cursor-pointer"
               title="Àdùkẹ́ Home"
             >
-              <span className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-[#121110] group-hover:text-[#14532D] transition-colors">
+              <span className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink-primary group-hover:text-brand-emerald transition-colors">
                 Àdùkẹ́
               </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#14532D]" />
-              <span className="hidden sm:inline text-[10px] font-mono uppercase tracking-widest text-[#8C8A82]">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-emerald" />
+              <span className="hidden sm:inline text-[10px] font-mono uppercase tracking-widest text-ink-muted">
                 Lagos
               </span>
             </button>
           </div>
 
           {/* ZONE 2: Clean Text Navigation Links */}
-          <nav className="hidden md:flex items-center gap-7 text-[13px] font-medium text-[#595852]">
+          <nav className="hidden md:flex items-center gap-7 text-[13px] font-medium text-ink-secondary">
             {navLinks.map((link) => {
               const isActive = activeSection === link.id;
               return (
                 <button
                   key={link.id}
                   onClick={() => onNavigate(link.id)}
-                  className={`relative py-1 transition-colors hover:text-[#121110] cursor-pointer ${
-                    isActive ? 'text-[#121110] font-semibold' : ''
+                  className={`relative py-1 transition-colors hover:text-ink-primary cursor-pointer ${
+                    isActive ? 'text-ink-primary font-semibold' : ''
                   }`}
                 >
                   <span>{link.label}</span>
                   {isActive && (
-                    <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#14532D] rounded-full" />
+                    <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-brand-emerald rounded-full" />
                   )}
                 </button>
               );
@@ -109,119 +77,43 @@ export const Navbar: React.FC<NavbarProps> = ({
           </nav>
 
           {/* ZONE 3: Functional Actions */}
-          <div className="flex items-center gap-2 sm:gap-2.5">
-
-            {/* Scan QR Table Ordering Action */}
-            <button
-              onClick={onOpenScanQR}
-              title="Scan Table QR code for direct ordering"
-              className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer shadow-2xs ${
-                activeTableSession
-                  ? 'bg-[#DCFCE7] text-[#14532D] border border-emerald-300 ring-1 ring-[#14532D]/20'
-                  : 'bg-white hover:bg-[#F4F3ED] text-[#121110] border border-[#E8E6DD]'
-              }`}
-            >
-              <QrCode className="w-4 h-4 text-[#14532D]" />
-              <span className="hidden sm:inline">
-                {activeTableSession ? `${activeTableSession.tableNumber}` : 'Scan Table QR'}
-              </span>
-              {activeTableSession && (
-                <span className="w-2 h-2 rounded-full bg-[#14532D] animate-pulse" />
-              )}
-            </button>
-            
-            {/* Live Order Tracker Trigger — Only shown and functional when user is logged in AND has an active order */}
-            {currentUser && activeOrder && (
-              <button
-                onClick={onOpenTracker}
-                className="hidden lg:flex items-center gap-2 px-3.5 py-2 bg-[#DCFCE7] text-[#14532D] hover:bg-[#BBF7D0] border border-emerald-300 rounded-xl text-xs font-semibold transition-all cursor-pointer shadow-2xs group"
-                title={`Track Order #${activeOrder.orderNumber}`}
-              >
-                <span className="w-2 h-2 rounded-full bg-[#14532D] animate-pulse" />
-                <span className="font-mono text-xs font-bold tracking-tight">
-                  Order #{activeOrder.orderNumber}
-                </span>
-                <span className="text-[10px] text-emerald-800 uppercase font-mono px-1.5 py-0.5 bg-emerald-100 rounded-md font-medium">
-                  {activeOrder.status === 'placed'
-                    ? 'Placed'
-                    : activeOrder.status === 'confirmed'
-                    ? 'Confirmed'
-                    : activeOrder.status === 'cooking'
-                    ? 'Cooking'
-                    : activeOrder.status === 'ready'
-                    ? 'Ready'
-                    : 'Active'}
-                </span>
-              </button>
-            )}
-
-            {/* Notification Bell Button */}
-            <button
-              onClick={onOpenNotifications}
-              aria-label="Order notifications and subscription preferences"
-              title="Real-time order notifications"
-              className="relative p-2 rounded-xl text-[#121110] hover:bg-white bg-[#FAFAF7] border border-[#E8E6DD] transition-all cursor-pointer shadow-2xs"
-            >
-              <Bell className="w-4 h-4 text-[#14532D]" />
-              {hasUnread && (
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#C2410C] ring-2 ring-white animate-pulse" />
-              )}
-            </button>
+          <div className="flex items-center gap-2 sm:gap-3">
 
             {/* Shopping Bag Button with Naira total */}
             <button
               onClick={onOpenCart}
               aria-label="View shopping bag"
-              className="relative flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-semibold text-[#121110] hover:bg-white bg-[#FAFAF7] border border-[#E8E6DD] transition-all cursor-pointer shadow-2xs"
+              className="relative flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-semibold text-ink-primary hover:bg-surface-pure bg-surface-canvas border border-surface-hairline transition-all cursor-pointer shadow-2xs"
             >
-              <ShoppingBag className="w-4 h-4 text-[#14532D]" />
+              <ShoppingBag className="w-4 h-4 text-brand-emerald" />
               <span className="hidden sm:inline">Bag</span>
               {cartCount > 0 ? (
                 <>
-                  <span className="w-5 h-5 rounded-full bg-[#C2410C] text-white font-mono text-[11px] font-bold flex items-center justify-center">
+                  <span className="w-5 h-5 rounded-full bg-brand-terracotta text-white font-mono text-[11px] font-bold flex items-center justify-center">
                     {cartCount}
                   </span>
-                  <span className="hidden lg:inline font-mono font-bold text-[#14532D] text-xs">
+                  <span className="hidden lg:inline font-mono font-bold text-brand-emerald text-xs">
                     {formatNaira(cartTotal)}
                   </span>
                 </>
               ) : (
-                <span className="font-mono text-[#8C8A82]">0</span>
+                <span className="font-mono text-ink-muted">0</span>
               )}
             </button>
 
             {/* Book Table Primary CTA */}
             <button
               onClick={onOpenReservation}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#14532D] hover:bg-[#0D3823] text-white text-xs font-semibold rounded-xl transition-all shadow-xs cursor-pointer"
+              className="btn-interactive inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 bg-brand-emerald hover:bg-brand-emerald-dark text-white text-xs font-semibold rounded-xl transition-all shadow-xs cursor-pointer"
             >
               <Utensils className="w-3.5 h-3.5" />
               <span>Book Table</span>
             </button>
 
-            {/* User Auth */}
-            {currentUser ? (
-              <button
-                onClick={() => logout()}
-                title={`Signed in as ${currentUser.displayName || currentUser.email}. Click to sign out.`}
-                className="p-2 rounded-xl bg-white border border-[#E8E6DD] text-[#8C8A82] hover:text-[#121110] hover:bg-[#F4F3ED] transition-colors cursor-pointer"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            ) : (
-              <button
-                onClick={onOpenAuth}
-                className="p-2 rounded-xl bg-white border border-[#E8E6DD] text-[#595852] hover:text-[#121110] hover:bg-[#F4F3ED] transition-colors cursor-pointer"
-                title="Account / Guest Sign In"
-              >
-                <User className="w-4 h-4" />
-              </button>
-            )}
-
             {/* Mobile Navigation Toggle Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-xl bg-white border border-[#E8E6DD] text-[#121110] hover:bg-[#F4F3ED] transition-colors cursor-pointer"
+              className="md:hidden p-2 rounded-xl bg-surface-pure border border-surface-hairline text-ink-primary hover:bg-surface-muted transition-colors cursor-pointer"
               aria-label="Toggle navigation menu"
               aria-expanded={mobileMenuOpen}
             >
@@ -232,9 +124,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         </div>
 
-        {/* Full Mobile Navigation Menu Drawer */}
+        {/* Mobile Navigation Menu Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-[#E8E6DD] space-y-2 text-left animate-fadeIn">
+          <div className="md:hidden py-4 border-t border-surface-hairline space-y-2 text-left animate-fadeIn">
             <div className="space-y-1">
               {navLinks.map((link) => (
                 <button
@@ -245,92 +137,29 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }}
                   className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-colors flex items-center justify-between ${
                     activeSection === link.id
-                      ? 'bg-[#DCFCE7] text-[#14532D] font-bold'
-                      : 'text-[#121110] hover:bg-white'
+                      ? 'bg-brand-emerald-light text-brand-emerald font-bold'
+                      : 'text-ink-primary hover:bg-surface-pure'
                   }`}
                 >
                   <span>{link.label}</span>
-                  <span className="text-[#8C8A82]">→</span>
+                  <span className="text-ink-muted">→</span>
                 </button>
               ))}
             </div>
 
-            {/* Live Order Tracker on Mobile — When logged in with active order */}
-            {currentUser && activeOrder && (
-              <div className="p-3 bg-[#DCFCE7]/70 border border-emerald-300/80 rounded-2xl flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-2 h-2 rounded-full bg-[#14532D] animate-pulse" />
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-mono text-xs font-bold text-[#121110]">
-                        Order #{activeOrder.orderNumber}
-                      </span>
-                      <span className="text-[10px] text-emerald-800 uppercase font-mono px-1.5 py-0.5 bg-emerald-100 rounded-md font-medium">
-                        {activeOrder.status}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-[#595852] mt-0.5">
-                      {activeOrder.items.length} {activeOrder.items.length === 1 ? 'item' : 'items'} · ETA: {activeOrder.estimatedDeliveryTime}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    onOpenTracker?.();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="px-3 py-1.5 bg-[#14532D] text-white text-xs font-semibold rounded-lg cursor-pointer shadow-xs"
-                >
-                  Track
-                </button>
-              </div>
-            )}
-
-            {/* Primary Mobile Action Buttons */}
-            <div className="pt-3 border-t border-[#E8E6DD] grid grid-cols-2 gap-2">
-              <button
-                onClick={() => {
-                  onOpenScanQR();
-                  setMobileMenuOpen(false);
-                }}
-                className="py-2.5 bg-white border border-[#E8E6DD] text-[#121110] font-bold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
-              >
-                <QrCode className="w-4 h-4 text-[#14532D]" />
-                <span>Scan QR</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  onOpenReservation();
-                  setMobileMenuOpen(false);
-                }}
-                className="py-2.5 bg-[#14532D] text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-xs"
-              >
-                <Utensils className="w-4 h-4" />
-                <span>Book Table</span>
-              </button>
-            </div>
-
-            {/* Direct Mobile Quick Contact & Staff Link */}
-            <div className="pt-3 border-t border-[#E8E6DD] flex items-center justify-between text-xs text-[#595852] px-1">
+            {/* Direct Mobile Quick Contact & Action */}
+            <div className="pt-3 border-t border-surface-hairline flex items-center justify-between text-xs text-ink-secondary px-1">
               <a
                 href="tel:+23414608910"
-                className="flex items-center gap-1.5 font-medium text-[#14532D] hover:underline"
+                className="flex items-center gap-1.5 font-medium text-brand-emerald hover:underline"
               >
                 <Phone className="w-3.5 h-3.5" />
                 <span>+234 1 460 8910</span>
               </a>
 
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  navigate('/admin');
-                }}
-                className="text-[#8C8A82] hover:text-[#121110] font-mono text-[11px] flex items-center gap-1 cursor-pointer"
-              >
-                <Shield className="w-3 h-3 text-[#14532D]" />
-                <span>Staff Portal</span>
-              </button>
+              <span className="text-ink-muted font-mono text-[11px]">
+                Victoria Island, Lagos
+              </span>
             </div>
           </div>
         )}

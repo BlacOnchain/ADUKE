@@ -1,71 +1,45 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import React, { useState, useEffect, useMemo } from 'react';
-import { restaurantDB } from './data/db';
+import React, { useState, useEffect } from 'react';
 import {
   MenuItem,
   CartItem,
   RestaurantOrder,
   TableReservation,
   CustomerReview,
-  TableSession,
-  StaffRole,
 } from './types/restaurant';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { INITIAL_NIGERIAN_MENU, NIGERIAN_SEATING_AREAS, INITIAL_REVIEWS } from './data/menuData';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { MenuSection } from './components/MenuSection';
 import { DishModal } from './components/DishModal';
 import { ReservationSection } from './components/ReservationSection';
 import { CartDrawer } from './components/CartDrawer';
-import { OrderTrackerModal } from './components/OrderTrackerModal';
 import { StorySection } from './components/StorySection';
 import { ReviewsSection } from './components/ReviewsSection';
-import { StaffDashboard } from './components/StaffDashboard';
-import { AuthModal } from './components/AuthModal';
-import { MenuManagementModal } from './components/MenuManagementModal';
-import { ScanQR } from './components/ScanQR';
-import { NotificationToast } from './components/NotificationToast';
-import { NotificationSubscriptionModal } from './components/NotificationSubscriptionModal';
 import { Footer } from './components/Footer';
 import { CookieConsent } from './components/CookieConsent';
 import { LegalModal } from './components/LegalModal';
-import { OrderHistoryDashboard } from './components/OrderHistoryDashboard';
 
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
-import { AdminLogin } from './components/AdminLogin';
-import { StaffOnboarding } from './components/StaffOnboarding';
-import { NotFound } from './components/NotFound';
+export default function App() {
+  const [menu] = useState<MenuItem[]>(INITIAL_NIGERIAN_MENU);
+  const [seatingAreas] = useState(NIGERIAN_SEATING_AREAS);
+  const [reviews, setReviews] = useState<CustomerReview[]>(INITIAL_REVIEWS);
 
-function MainApp() {
-  // DB Reactive State
-  const [menu, setMenu] = useState<MenuItem[]>(() => restaurantDB.getMenu());
-  const [seatingAreas] = useState(() => restaurantDB.getSeatingAreas());
-  const [orders, setOrders] = useState<RestaurantOrder[]>(() => restaurantDB.getOrders());
-  const [reservations, setReservations] = useState<TableReservation[]>(() => restaurantDB.getReservations());
-  const [reviews, setReviews] = useState<CustomerReview[]>(() => restaurantDB.getReviews());
-
-  // Navigation & View state
+  // Active section for smooth scrolling
   const [activeSection, setActiveSection] = useState<string>('hero');
 
-  // Table QR Session State
-  const [isScanQROpen, setIsScanQROpen] = useState(false);
-  const [activeTableSession, setActiveTableSession] = useState<TableSession | null>(null);
-
-  // Notification Subscription Modal State
-  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
-
-  // Legal Modal State
+  // Modals
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [selectedDish, setSelectedDish] = useState<MenuItem | null>(null);
   const [isLegalOpen, setIsLegalOpen] = useState(false);
   const [legalTab, setLegalTab] = useState<'privacy' | 'terms'>('privacy');
 
-  // Cart state
+  // Local Orders list (in-memory demo state)
+  const [, setLocalOrders] = useState<RestaurantOrder[]>([]);
+
+  // Cart state with local storage persistence
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {
-      const saved = localStorage.getItem('aduke_cart_v2');
+      const saved = localStorage.getItem('aduke_cart_v3');
       if (saved) return JSON.parse(saved);
     } catch {
       // ignore
@@ -73,49 +47,13 @@ function MainApp() {
     return [];
   });
 
-  // Save cart changes
   useEffect(() => {
     try {
-      localStorage.setItem('aduke_cart_v2', JSON.stringify(cart));
+      localStorage.setItem('aduke_cart_v3', JSON.stringify(cart));
     } catch {
       // ignore
     }
   }, [cart]);
-
-  // Modals
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [selectedDish, setSelectedDish] = useState<MenuItem | null>(null);
-  const [trackerOrder, setTrackerOrder] = useState<RestaurantOrder | null>(null);
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
-
-  // User Auth context
-  const { currentUser } = useAuth();
-
-  // Subscribe to DB updates
-  useEffect(() => {
-    const unsubscribe = restaurantDB.subscribe(() => {
-      setMenu(restaurantDB.getMenu());
-      setOrders(restaurantDB.getOrders());
-      setReservations(restaurantDB.getReservations());
-      setReviews(restaurantDB.getReviews());
-    });
-    return () => unsubscribe();
-  }, []);
-
-  // Most recent ongoing order — available only when logged into an account with an active order
-  const activeOrder = useMemo(() => {
-    if (!currentUser) return undefined;
-    return (
-      orders.find(
-        (o) =>
-          o.status !== 'completed' &&
-          o.status !== 'cancelled' &&
-          (o.customerEmail?.toLowerCase() === currentUser.email?.toLowerCase() ||
-           o.userId === currentUser.uid)
-      ) ||
-      orders.find((o) => o.status !== 'completed' && o.status !== 'cancelled')
-    );
-  }, [orders, currentUser]);
 
   // Cart calculations
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -184,16 +122,15 @@ function MainApp() {
   };
 
   const handleOrderPlaced = (order: RestaurantOrder) => {
-    setTrackerOrder(order);
+    setLocalOrders((prev) => [order, ...prev]);
   };
 
-  const handleReorder = (order: RestaurantOrder) => {
-    const newCartItems: CartItem[] = order.items.map((i) => ({
-      ...i,
-      cartItemId: `${i.item.id}-${Date.now()}-${Math.random()}`,
-    }));
-    setCart(newCartItems);
-    setIsCartOpen(true);
+  const handleReservationComplete = (_reservation: TableReservation) => {
+    // Local reservation confirmed
+  };
+
+  const handleAddReview = (review: CustomerReview) => {
+    setReviews((prev) => [review, ...prev]);
   };
 
   const scrollToSection = (sectionId: string) => {
@@ -214,8 +151,7 @@ function MainApp() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF7] text-[#121110] flex flex-col selection:bg-[#14532D] selection:text-white">
-      
+    <div className="min-h-screen bg-surface-canvas text-ink-primary flex flex-col selection:bg-brand-emerald selection:text-white">
       {/* Top Bar Navigation */}
       <Navbar
         activeSection={activeSection}
@@ -224,57 +160,42 @@ function MainApp() {
         cartTotal={cartTotal}
         onOpenCart={() => setIsCartOpen(true)}
         onOpenReservation={() => scrollToSection('reservation')}
-        onOpenScanQR={() => setIsScanQROpen(true)}
-        onOpenNotifications={() => setIsNotificationModalOpen(true)}
-        activeTableSession={activeTableSession}
-        activeOrder={activeOrder}
-        onOpenTracker={() => setTrackerOrder(activeOrder || orders[0] || null)}
-        isStaffMode={false}
-        onToggleStaffMode={() => {}}
-        onOpenAuth={() => setIsAuthOpen(true)}
-        onOpenMenuManager={() => {}}
       />
 
+      {/* Main Content Sections */}
       <main className="flex-1">
-        {activeSection === 'order-history' ? (
-          <OrderHistoryDashboard
-            orders={orders}
-            onReorder={handleReorder}
-            onTrackOrder={(order) => setTrackerOrder(order)}
-            onOpenAuth={() => setIsAuthOpen(true)}
-            onNavigateToMenu={() => scrollToSection('menu')}
-          />
-        ) : (
-          <>
-            <Hero
-              onBookTable={() => scrollToSection('reservation')}
-              onExploreMenu={() => scrollToSection('menu')}
-            />
+        <Hero
+          onBookTable={() => scrollToSection('reservation')}
+          onExploreMenu={() => scrollToSection('menu')}
+        />
 
-            <MenuSection
-              menu={menu}
-              onSelectDish={(dish) => setSelectedDish(dish)}
-              onQuickAdd={handleQuickAdd}
-              onOpenMenuManager={() => {}}
-            />
+        <MenuSection
+          menu={menu}
+          onSelectDish={(dish) => setSelectedDish(dish)}
+          onQuickAdd={handleQuickAdd}
+        />
 
-            <ReservationSection
-              seatingAreas={seatingAreas}
-              onReservationComplete={() => {}}
-            />
+        <ReservationSection
+          seatingAreas={seatingAreas}
+          onReservationComplete={handleReservationComplete}
+        />
 
-            <StorySection />
-            <ReviewsSection reviews={reviews} />
-          </>
-        )}
+        <StorySection />
+
+        <ReviewsSection
+          reviews={reviews}
+          onAddReview={handleAddReview}
+        />
       </main>
 
+      {/* Footer */}
       <Footer
         onNavigate={scrollToSection}
         onBookTable={() => scrollToSection('reservation')}
         onOpenLegal={handleOpenLegal}
       />
 
+      {/* Cart Drawer */}
       <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
@@ -283,126 +204,24 @@ function MainApp() {
         onRemoveItem={handleRemoveFromCart}
         onClearCart={handleClearCart}
         onOrderPlaced={handleOrderPlaced}
-        activeTableSession={activeTableSession}
-        onOpenAuth={() => setIsAuthOpen(true)}
       />
 
-      <ScanQR
-        isOpen={isScanQROpen}
-        onClose={() => setIsScanQROpen(false)}
-        activeTableSession={activeTableSession}
-        onSelectTableSession={(session) => {
-          setActiveTableSession(session);
-        }}
-        onOrderForTable={() => {
-          setIsScanQROpen(false);
-          setIsCartOpen(true);
-        }}
-      />
-
+      {/* Dish Customization Modal */}
       <DishModal
         item={selectedDish}
         onClose={() => setSelectedDish(null)}
         onAddToCart={handleAddToCart}
       />
 
-      <OrderTrackerModal
-        order={trackerOrder}
-        onClose={() => setTrackerOrder(null)}
-        onStatusChange={(orderId, newStatus) => {
-          if (trackerOrder && trackerOrder.id === orderId) {
-            setTrackerOrder({ ...trackerOrder, status: newStatus });
-          }
-        }}
-      />
-
-      <AuthModal
-        isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
-      />
-
+      {/* Legal & Privacy Modal */}
       <LegalModal
         isOpen={isLegalOpen}
         onClose={() => setIsLegalOpen(false)}
         initialTab={legalTab}
       />
 
-      <NotificationSubscriptionModal
-        isOpen={isNotificationModalOpen}
-        onClose={() => setIsNotificationModalOpen(false)}
-        activeOrderNumber={activeOrder?.orderNumber}
-      />
-
-      <NotificationToast />
+      {/* Local Cookie Preferences Banner */}
       <CookieConsent />
-
     </div>
-  );
-}
-
-function AdminRouteWrapper() {
-  const { profile } = useAuth();
-  const navigate = useNavigate();
-  const isStaffLoggedIn = profile && profile.role !== 'customer';
-  const [isMenuManagerOpen, setIsMenuManagerOpen] = useState(false);
-
-  const orders = restaurantDB.getOrders();
-  const reservations = restaurantDB.getReservations();
-  const menu = restaurantDB.getMenu();
-
-  if (!isStaffLoggedIn) {
-    return <AdminLogin />;
-  }
-
-  return (
-    <>
-      <StaffDashboard
-        orders={orders}
-        reservations={reservations}
-        menu={menu}
-        currentRole={(profile?.role as StaffRole) || 'owner'}
-        onClose={() => navigate('/')}
-        onOpenMenuManager={() => setIsMenuManagerOpen(true)}
-      />
-      <MenuManagementModal
-        isOpen={isMenuManagerOpen}
-        onClose={() => setIsMenuManagerOpen(false)}
-        menu={menu}
-      />
-    </>
-  );
-}
-
-function RedirectHandler() {
-  const navigate = useNavigate();
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const p = params.get('p');
-    const role = params.get('role') || params.get('inviteRole');
-    
-    if (p) {
-      window.history.replaceState({}, '', window.location.pathname + p + window.location.hash);
-      navigate(p, { replace: true });
-    } else if (role && window.location.pathname === '/') {
-      navigate(`/staff-onboard${window.location.search}`, { replace: true });
-    }
-  }, [navigate]);
-  return null;
-}
-
-export default function App() {
-  return (
-    <BrowserRouter>
-      <AuthProvider>
-        <RedirectHandler />
-        <Routes>
-          <Route path="/" element={<MainApp />} />
-          <Route path="/admin" element={<AdminRouteWrapper />} />
-          <Route path="/staff-onboard" element={<StaffOnboarding />} />
-          <Route path="/404" element={<NotFound />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>
   );
 }
