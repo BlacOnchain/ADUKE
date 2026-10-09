@@ -59,13 +59,13 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
         guestName: guestName.trim(),
         guestEmail: guestEmail.trim(),
         guestPhone: guestPhone.trim(),
-        partySize,
         date,
         timeSlot: selectedTimeSlot,
+        partySize,
         seatingAreaId: selectedArea.id,
         seatingAreaName: selectedArea.name,
-        specialRequests: specialRequests.trim() || undefined,
         occasion,
+        specialRequests: specialRequests.trim() || undefined,
         status: 'confirmed',
         createdAt: new Date().toISOString(),
       };
@@ -74,79 +74,71 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
       setConfirmedReservation(reservation);
       onReservationComplete?.(reservation);
 
-      // Confetti burst
-      try {
-        confetti({
-          particleCount: 65,
-          spread: 55,
-          origin: { y: 0.6 },
-          colors: ['#14532D', '#C2410C', '#C89B3C'],
-        });
-      } catch {
-        // ignore
+      // Confetti celebration (respects prefers-reduced-motion)
+      const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!isReduced) {
+        try {
+          confetti({
+            particleCount: 65,
+            spread: 55,
+            origin: { y: 0.6 },
+            colors: ['#14532D', '#C2410C', '#C89B3C'],
+          });
+        } catch {
+          // ignore
+        }
       }
     }, 400);
   };
 
   const handleBookAnother = () => {
     setConfirmedReservation(null);
-    setGuestName('');
-    setGuestPhone('');
-    setGuestEmail('');
     setSpecialRequests('');
   };
 
   return (
-    <section id="reservation-section" className="py-12 sm:py-24 bg-surface-canvas text-ink-primary border-t border-surface-hairline">
-      <div className="max-w-4xl mx-auto px-3.5 sm:px-6 lg:px-8">
+    <section id="reservation-section" className="py-16 sm:py-24 bg-surface-canvas text-ink-primary border-t border-surface-hairline">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="max-w-2xl mx-auto text-center space-y-2 sm:space-y-3 mb-8 sm:mb-12">
-          <div className="inline-flex items-center gap-2 text-xs font-bold tracking-wider uppercase text-brand-emerald">
-            <span className="w-2 h-2 rounded-full bg-brand-emerald" />
-            <span>Table Reservations</span>
+        <div className="text-center max-w-2xl mx-auto space-y-3 mb-10 sm:mb-14">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-emerald-light text-brand-emerald text-xs font-semibold">
+            <Clock aria-hidden="true" className="w-3.5 h-3.5" />
+            <span>Victoria Island Table Reservations</span>
           </div>
+
           <h2 
             className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-ink-primary"
             style={{ textWrap: 'balance' }}
           >
-            Book your table with us.
+            Reserve Your Hearth Table
           </h2>
-          <p className="text-xs sm:text-sm text-ink-secondary font-normal leading-relaxed">
-            Reserve your table in seconds and we'll have your spot and warm hospitality ready when you arrive.
+
+          <p className="text-sm sm:text-base text-ink-secondary font-normal">
+            Select your preferred dining room, sitting time, and party size. We hold reserved tables for up to 15 minutes past arrival time.
           </p>
         </div>
 
-        {/* Successful Digital Reservation Pass View */}
         {confirmedReservation ? (
-          <div className="max-w-xl mx-auto bg-surface-pure rounded-2xl sm:rounded-3xl border border-surface-hairline shadow-lg overflow-hidden text-left animate-fadeIn">
+          /* Confirmation Pass */
+          <div className="bg-surface-pure rounded-3xl border border-surface-hairline shadow-lg p-6 sm:p-10 text-left max-w-2xl mx-auto space-y-6 animate-pop-in">
             
-            {/* Top Pass Header */}
-            <div className="p-6 sm:p-8 bg-brand-emerald text-white space-y-2 sm:space-y-3 relative overflow-hidden">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#4ADE80]" />
-                  <span className="text-xs font-mono uppercase tracking-widest text-brand-emerald-light font-bold">
-                    Reservation Confirmed
-                  </span>
-                </div>
-                <span className="font-mono text-xs sm:text-sm font-bold tracking-wider bg-black/20 px-2.5 py-1 rounded-lg">
-                  {confirmedReservation.bookingCode}
-                </span>
+            <div className="p-4 rounded-2xl bg-brand-emerald-light/60 border border-brand-emerald/20 flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-full bg-brand-emerald text-white flex items-center justify-center shrink-0">
+                <Check aria-hidden="true" className="w-5 h-5 stroke-[3]" />
               </div>
-
-              <h3 className="font-display text-2xl sm:text-3xl font-bold text-white">
-                Àdùkẹ́ Gastronomy
-              </h3>
-
-              <p className="text-xs text-emerald-100">
-                14 Adeola Odeku Street, Victoria Island · Lagos State, Nigeria
-              </p>
+              <div>
+                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-brand-emerald block">
+                  Table Reservation Confirmed
+                </span>
+                <h3 className="font-display text-xl font-bold text-ink-primary">
+                  Booking Code: {confirmedReservation.bookingCode}
+                </h3>
+              </div>
             </div>
 
-            {/* Pass Body Content */}
-            <div className="p-5 sm:p-8 space-y-5 sm:space-y-6">
-              <div className="grid grid-cols-2 gap-4 sm:gap-6 pb-5 sm:pb-6 border-b border-surface-hairline text-xs">
+            <div className="p-5 rounded-2xl bg-surface-canvas border border-surface-hairline space-y-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <span className="text-ink-muted block text-[10px] sm:text-[11px] uppercase tracking-wider font-medium">Guest Name</span>
                   <span className="font-bold text-sm text-ink-primary mt-0.5 block truncate">{confirmedReservation.guestName}</span>
@@ -175,7 +167,7 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
               )}
 
               <div className="flex items-center gap-2.5 text-xs text-ink-secondary">
-                <ShieldCheck className="w-4 h-4 text-brand-emerald shrink-0" />
+                <ShieldCheck aria-hidden="true" className="w-4 h-4 text-brand-emerald shrink-0" />
                 <span>
                   Tables held for 15 mins. Free valet parking on Adeola Odeku.
                 </span>
@@ -205,13 +197,14 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
           /* Mobile-Optimized Sleek Rectangular Booking Container */
           <form
             onSubmit={handleBookingSubmit}
+            noValidate={false}
             className="bg-surface-pure rounded-2xl sm:rounded-3xl border border-surface-hairline shadow-sm p-4 sm:p-8 lg:p-10 space-y-7 sm:space-y-9 text-left"
           >
             {/* Step 1: Seating Area Selection */}
-            <div className="space-y-3 sm:space-y-4">
-              <div>
+            <fieldset className="space-y-3 sm:space-y-4">
+              <legend>
                 <h3 className="font-display text-base sm:text-xl font-bold text-ink-primary flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-brand-emerald text-white text-[11px] font-mono font-bold flex items-center justify-center shrink-0">
+                  <span aria-hidden="true" className="w-5 h-5 rounded-full bg-brand-emerald text-white text-[11px] font-mono font-bold flex items-center justify-center shrink-0">
                     1
                   </span>
                   <span>Choose Seating Area</span>
@@ -219,16 +212,18 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                 <p className="text-xs text-ink-secondary mt-0.5 ml-7">
                   Select where you'd like your table prepared.
                 </p>
-              </div>
+              </legend>
 
               {/* Responsive Rectangular Cards Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+              <div role="radiogroup" aria-label="Seating area selection" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
                 {seatingAreas.map((area) => {
                   const isSelected = selectedAreaId === area.id;
                   return (
                     <button
                       key={area.id}
                       type="button"
+                      role="radio"
+                      aria-checked={isSelected}
                       onClick={() => setSelectedAreaId(area.id)}
                       className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left transition-all cursor-pointer flex flex-row sm:flex-col justify-between items-center sm:items-start gap-3 ${
                         isSelected
@@ -253,6 +248,7 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                           {area.totalTables} tables
                         </span>
                         <div
+                          aria-hidden="true"
                           className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${
                             isSelected
                               ? 'bg-brand-emerald text-white'
@@ -266,13 +262,13 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                   );
                 })}
               </div>
-            </div>
+            </fieldset>
 
             {/* Step 2: Date, Party Size & Time Slots */}
             <div className="space-y-4 sm:space-y-5 pt-5 sm:pt-7 border-t border-surface-hairline">
               <div>
                 <h3 className="font-display text-base sm:text-xl font-bold text-ink-primary flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-brand-emerald text-white text-[11px] font-mono font-bold flex items-center justify-center shrink-0">
+                  <span aria-hidden="true" className="w-5 h-5 rounded-full bg-brand-emerald text-white text-[11px] font-mono font-bold flex items-center justify-center shrink-0">
                     2
                   </span>
                   <span>Date, Time & Number of Guests</span>
@@ -337,17 +333,17 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
               </div>
 
               {/* Time Slot Selection */}
-              <div className="space-y-2 pt-1">
-                <div className="flex items-center justify-between text-xs">
+              <fieldset className="space-y-2 pt-1">
+                <legend className="flex items-center justify-between text-xs w-full">
                   <span className="font-semibold text-ink-primary">
                     Select Sitting Time
                   </span>
                   <span className="text-[11px] text-ink-secondary">
                     Available slots for {date}
                   </span>
-                </div>
+                </legend>
 
-                <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-1.5 sm:gap-2">
+                <div role="radiogroup" aria-label="Sitting time slot" className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-1.5 sm:gap-2">
                   {timeSlots.map((time) => {
                     const isSelected = selectedTimeSlot === time;
 
@@ -355,6 +351,9 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                       <button
                         key={time}
                         type="button"
+                        role="radio"
+                        aria-checked={isSelected}
+                        aria-label={`Sitting at ${time}`}
                         onClick={() => setSelectedTimeSlot(time)}
                         className={`py-2 px-1.5 sm:py-2.5 sm:px-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center min-h-[44px] ${
                           isSelected
@@ -374,14 +373,14 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                     );
                   })}
                 </div>
-              </div>
+              </fieldset>
             </div>
 
             {/* Step 3: Guest Contact & Dietary Requests */}
             <div className="space-y-4 pt-5 sm:pt-7 border-t border-surface-hairline">
               <div>
                 <h3 className="font-display text-base sm:text-xl font-bold text-ink-primary flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-brand-emerald text-white text-[11px] font-mono font-bold flex items-center justify-center shrink-0">
+                  <span aria-hidden="true" className="w-5 h-5 rounded-full bg-brand-emerald text-white text-[11px] font-mono font-bold flex items-center justify-center shrink-0">
                     3
                   </span>
                   <span>Primary Guest Details</span>
@@ -397,6 +396,8 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                     id="res-guest-name"
                     required
                     type="text"
+                    aria-invalid={bookingError && !guestName.trim() ? 'true' : 'false'}
+                    aria-describedby={bookingError && !guestName.trim() ? 'booking-error-msg' : undefined}
                     placeholder="e.g. Oluwaseun Adeleke"
                     value={guestName}
                     onChange={(e) => setGuestName(e.target.value)}
@@ -412,6 +413,8 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                     id="res-guest-phone"
                     required
                     type="tel"
+                    aria-invalid={bookingError && !guestPhone.trim() ? 'true' : 'false'}
+                    aria-describedby={bookingError && !guestPhone.trim() ? 'booking-error-msg' : undefined}
                     placeholder="+234 803 123 4567"
                     value={guestPhone}
                     onChange={(e) => setGuestPhone(e.target.value)}
@@ -427,6 +430,8 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                     id="res-guest-email"
                     required
                     type="email"
+                    aria-invalid={bookingError && !guestEmail.trim() ? 'true' : 'false'}
+                    aria-describedby={bookingError && !guestEmail.trim() ? 'booking-error-msg' : undefined}
                     placeholder="guest@example.com"
                     value={guestEmail}
                     onChange={(e) => setGuestEmail(e.target.value)}
@@ -451,7 +456,7 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
             </div>
 
             {bookingError && (
-              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs">
+              <div id="booking-error-msg" role="alert" className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs">
                 <span>{bookingError}</span>
               </div>
             )}
@@ -459,7 +464,7 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
             {/* Submit Action Bar */}
             <div className="pt-4 sm:pt-6 border-t border-surface-hairline flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
               <div className="text-xs text-ink-secondary flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-brand-emerald shrink-0" />
+                <ShieldCheck aria-hidden="true" className="w-4 h-4 text-brand-emerald shrink-0" />
                 <span>No cancellation fee when modified 4+ hours prior.</span>
               </div>
 
@@ -469,7 +474,7 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                 className="btn-interactive w-full sm:w-auto px-6 sm:px-8 py-3.5 bg-brand-emerald hover:bg-brand-emerald-dark disabled:opacity-50 text-white text-xs sm:text-sm font-semibold uppercase tracking-wider rounded-xl transition-all shadow-md shadow-emerald-950/15 flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
               >
                 <span>{isSubmitting ? 'Confirming Reservation...' : 'Confirm Table Reservation'}</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight aria-hidden="true" className="w-4 h-4" />
               </button>
             </div>
 

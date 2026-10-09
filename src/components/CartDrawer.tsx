@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Bike, Store, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { CartItem, OrderType, RestaurantOrder, formatNaira } from '../types/restaurant';
 import confetti from 'canvas-confetti';
@@ -11,6 +11,7 @@ interface CartDrawerProps {
   onRemoveItem: (cartItemId: string) => void;
   onClearCart: () => void;
   onOrderPlaced?: (order: RestaurantOrder) => void;
+  onTrackOrder?: (orderId: string) => void;
 }
 
 export const CartDrawer: React.FC<CartDrawerProps> = ({
@@ -21,6 +22,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   onRemoveItem,
   onClearCart,
   onOrderPlaced,
+  onTrackOrder,
 }) => {
   const [orderType, setOrderType] = useState<OrderType>('delivery');
   const [customerName, setCustomerName] = useState('');
@@ -32,6 +34,60 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [confirmedOrder, setConfirmedOrder] = useState<RestaurantOrder | null>(null);
+
+  const drawerRef = useRef<HTMLElement>(null);
+  const previouslyFocusedElement = useRef<HTMLElement | null>(null);
+
+  // Focus trap, scroll lock, and ESC listener
+  useEffect(() => {
+    if (!isOpen) return;
+
+    previouslyFocusedElement.current = document.activeElement as HTMLElement;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const focusables = drawerRef.current?.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusables && focusables.length > 0) {
+      focusables[0].focus();
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        if (!drawerRef.current) return;
+        const elements = drawerRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (!elements.length) return;
+
+        const first = elements[0];
+        const last = elements[elements.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+      previouslyFocusedElement.current?.focus();
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -85,16 +141,19 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       onOrderPlaced?.(newOrder);
       onClearCart();
 
-      // Confetti celebration
-      try {
-        confetti({
-          particleCount: 70,
-          spread: 60,
-          origin: { y: 0.7 },
-          colors: ['#14532D', '#C2410C', '#C89B3C'],
-        });
-      } catch {
-        // ignore
+      // Confetti celebration (respects prefers-reduced-motion)
+      const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!isReduced) {
+        try {
+          confetti({
+            particleCount: 70,
+            spread: 60,
+            origin: { y: 0.7 },
+            colors: ['#14532D', '#C2410C', '#C89B3C'],
+          });
+        } catch {
+          // ignore
+        }
       }
     }, 400);
   };
@@ -114,13 +173,19 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       />
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <aside className="w-screen max-w-md bg-surface-pure border-l border-surface-hairline shadow-2xl flex flex-col text-left animate-slideInRight">
+        <aside
+          ref={drawerRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cart-drawer-title"
+          className="w-screen max-w-md bg-surface-pure border-l border-surface-hairline shadow-2xl flex flex-col text-left animate-slideInRight"
+        >
           
           {/* Header */}
           <div className="p-5 border-b border-surface-hairline flex items-center justify-between bg-surface-canvas">
             <div className="flex items-center gap-2">
-              <ShoppingBag className="w-5 h-5 text-brand-emerald" />
-              <h2 className="font-display text-lg font-bold text-ink-primary">
+              <ShoppingBag aria-hidden="true" className="w-5 h-5 text-brand-emerald" />
+              <h2 id="cart-drawer-title" className="font-display text-lg font-bold text-ink-primary">
                 Your Dining Bag
               </h2>
               {items.length > 0 && !confirmedOrder && (
@@ -132,9 +197,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
             <button
               onClick={onClose}
+              aria-label="Close dining bag drawer"
               className="p-2 rounded-xl bg-surface-pure border border-surface-hairline text-ink-muted hover:text-ink-primary transition-colors cursor-pointer"
             >
-              <X className="w-4 h-4" />
+              <X aria-hidden="true" className="w-4 h-4" />
             </button>
           </div>
 
@@ -145,7 +211,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               <div className="space-y-6 py-4 animate-fadeIn">
                 <div className="p-6 rounded-2xl bg-brand-emerald-light/60 border border-brand-emerald/20 text-center space-y-3">
                   <div className="w-12 h-12 rounded-full bg-brand-emerald text-white flex items-center justify-center mx-auto shadow-md">
-                    <CheckCircle2 className="w-6 h-6" />
+                    <CheckCircle2 aria-hidden="true" className="w-6 h-6" />
                   </div>
                   <div>
                     <span className="text-xs font-mono uppercase tracking-widest text-brand-emerald font-bold">
@@ -181,19 +247,35 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleStartNewOrder}
-                  className="btn-interactive w-full py-3.5 bg-brand-emerald hover:bg-brand-emerald-dark text-white text-xs font-semibold rounded-xl shadow-md transition-all cursor-pointer text-center"
-                >
-                  Done / Close Bag
-                </button>
+                <div className="space-y-2.5">
+                  {onTrackOrder && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const orderId = confirmedOrder.id;
+                        handleStartNewOrder();
+                        onTrackOrder(orderId);
+                      }}
+                      className="btn-interactive w-full py-3.5 bg-brand-emerald hover:bg-brand-emerald-dark text-white text-xs font-semibold rounded-xl shadow-md transition-all cursor-pointer text-center flex items-center justify-center gap-2"
+                    >
+                      <span>Track Order Progress Live</span>
+                      <ArrowRight aria-hidden="true" className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleStartNewOrder}
+                    className="w-full py-2.5 text-ink-secondary hover:text-ink-primary text-xs font-semibold transition-colors cursor-pointer text-center"
+                  >
+                    Close Bag
+                  </button>
+                </div>
               </div>
             ) : items.length === 0 ? (
               /* Empty Bag State */
               <div className="py-20 text-center space-y-4">
                 <div className="w-16 h-16 rounded-full bg-surface-muted flex items-center justify-center mx-auto text-ink-muted">
-                  <ShoppingBag className="w-7 h-7" />
+                  <ShoppingBag aria-hidden="true" className="w-7 h-7" />
                 </div>
                 <div>
                   <p className="font-display text-base font-bold text-ink-primary">Your bag is empty</p>
@@ -206,7 +288,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   className="px-5 py-2.5 bg-brand-emerald hover:bg-brand-emerald-dark text-white text-xs font-semibold rounded-xl transition-all cursor-pointer inline-flex items-center gap-2"
                 >
                   <span>Browse Culinary Menu</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight aria-hidden="true" className="w-3.5 h-3.5" />
                 </button>
               </div>
             ) : (
@@ -227,7 +309,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                           : 'text-ink-secondary hover:text-ink-primary'
                       }`}
                     >
-                      <Bike className="w-3.5 h-3.5" />
+                      <Bike aria-hidden="true" className="w-3.5 h-3.5" />
                       <span>Delivery</span>
                     </button>
 
@@ -240,7 +322,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                           : 'text-ink-secondary hover:text-ink-primary'
                       }`}
                     >
-                      <Store className="w-3.5 h-3.5" />
+                      <Store aria-hidden="true" className="w-3.5 h-3.5" />
                       <span>Pickup</span>
                     </button>
                   </div>
@@ -254,9 +336,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     </span>
                     <button
                       onClick={onClearCart}
+                      aria-label="Remove all dishes from bag"
                       className="text-[11px] text-ink-muted hover:text-brand-terracotta flex items-center gap-1 transition-colors cursor-pointer"
                     >
-                      <Trash2 className="w-3 h-3" />
+                      <Trash2 aria-hidden="true" className="w-3 h-3" />
                       <span>Clear all</span>
                     </button>
                   </div>
@@ -288,19 +371,21 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                           <button
                             type="button"
                             onClick={() => onUpdateQuantity(cartItem.cartItemId, cartItem.quantity - 1)}
+                            aria-label={`Decrease quantity of ${cartItem.item.name}`}
                             className="w-5 h-5 rounded flex items-center justify-center text-ink-secondary hover:text-ink-primary hover:bg-surface-pure transition-colors cursor-pointer"
                           >
-                            <Minus className="w-3 h-3" />
+                            <Minus aria-hidden="true" className="w-3 h-3" />
                           </button>
-                          <span className="font-mono text-xs font-bold text-ink-primary w-4 text-center">
+                          <span aria-label={`Quantity: ${cartItem.quantity}`} className="font-mono text-xs font-bold text-ink-primary w-4 text-center">
                             {cartItem.quantity}
                           </span>
                           <button
                             type="button"
                             onClick={() => onUpdateQuantity(cartItem.cartItemId, cartItem.quantity + 1)}
+                            aria-label={`Increase quantity of ${cartItem.item.name}`}
                             className="w-5 h-5 rounded flex items-center justify-center text-ink-secondary hover:text-ink-primary hover:bg-surface-pure transition-colors cursor-pointer"
                           >
-                            <Plus className="w-3 h-3" />
+                            <Plus aria-hidden="true" className="w-3 h-3" />
                           </button>
                         </div>
                       </div>
@@ -316,10 +401,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
                   <div className="space-y-3 text-xs">
                     <div>
-                      <label className="block text-[11px] font-semibold text-ink-primary mb-1">
+                      <label htmlFor="cart-customer-name" className="block text-[11px] font-semibold text-ink-primary mb-1">
                         Full Name *
                       </label>
                       <input
+                        id="cart-customer-name"
                         type="text"
                         required
                         placeholder="e.g. Babatunde Adeleke"
@@ -330,10 +416,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-semibold text-ink-primary mb-1">
+                      <label htmlFor="cart-customer-phone" className="block text-[11px] font-semibold text-ink-primary mb-1">
                         Mobile Phone *
                       </label>
                       <input
+                        id="cart-customer-phone"
                         type="tel"
                         required
                         placeholder="+234 803 123 4567"
@@ -345,10 +432,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
                     {orderType === 'delivery' && (
                       <div>
-                        <label className="block text-[11px] font-semibold text-ink-primary mb-1">
+                        <label htmlFor="cart-delivery-address" className="block text-[11px] font-semibold text-ink-primary mb-1">
                           Delivery Destination Address *
                         </label>
                         <input
+                          id="cart-delivery-address"
                           type="text"
                           required
                           placeholder="e.g. 14 Adeola Odeku St, Victoria Island, Lagos"
@@ -361,14 +449,15 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
                     {/* Tip Selection */}
                     <div>
-                      <label className="block text-[11px] font-semibold text-ink-primary mb-1">
+                      <span className="block text-[11px] font-semibold text-ink-primary mb-1">
                         Hearth Crew Hospitality Tip
-                      </label>
+                      </span>
                       <div className="grid grid-cols-4 gap-1.5">
                         {[0, 10, 15, 20].map((pct) => (
                           <button
                             key={pct}
                             type="button"
+                            aria-label={`Select ${pct === 0 ? 'no' : pct + '%'} hospitality tip`}
                             onClick={() => setTipPercentage(pct)}
                             className={`py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                               tipPercentage === pct
@@ -384,10 +473,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
                     {/* Special Notes */}
                     <div>
-                      <label className="block text-[11px] font-semibold text-ink-primary mb-1">
+                      <label htmlFor="cart-kitchen-notes" className="block text-[11px] font-semibold text-ink-primary mb-1">
                         Kitchen Notes (Optional)
                       </label>
                       <input
+                        id="cart-kitchen-notes"
                         type="text"
                         placeholder="e.g. Extra yaji pepper, cutlery included"
                         value={specialNotes}
@@ -426,8 +516,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   </div>
 
                   {checkoutError && (
-                    <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                    <div role="alert" className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs flex items-center gap-2">
+                      <AlertCircle aria-hidden="true" className="w-4 h-4 shrink-0 text-rose-600" />
                       <span>{checkoutError}</span>
                     </div>
                   )}
@@ -439,7 +529,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     className="btn-interactive w-full py-3.5 bg-brand-emerald hover:bg-brand-emerald-dark disabled:opacity-50 text-white text-xs font-semibold uppercase tracking-wider rounded-xl shadow-md shadow-emerald-950/15 flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <span>{isSubmitting ? 'Placing Order...' : `Place Order · ${formatNaira(total)}`}</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight aria-hidden="true" className="w-4 h-4" />
                   </button>
                 </form>
               </>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MapPin, Phone, Clock, Mail, ArrowUpRight } from 'lucide-react';
 
 interface FooterProps {
@@ -27,13 +27,14 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenL
           <div className="space-y-4">
             <button
               onClick={() => onNavigate('hero')}
+              aria-label="Return to top of Àdùkẹ́ homepage"
               className="group flex items-baseline gap-2 cursor-pointer text-left"
               title="Return to top"
             >
               <span className="font-display text-3xl font-bold tracking-tight text-ink-primary group-hover:text-brand-emerald transition-colors">
                 Àdùkẹ́
               </span>
-              <span className="w-2 h-2 rounded-full bg-brand-emerald" />
+              <span aria-hidden="true" className="w-2 h-2 rounded-full bg-brand-emerald" />
               <span className="text-[10px] font-mono uppercase tracking-widest text-ink-muted">
                 Lagos
               </span>
@@ -46,6 +47,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenL
             <div className="pt-2">
               <button
                 onClick={onBookTable}
+                aria-label="Reserve a dining table at Àdùkẹ́"
                 className="btn-interactive px-4 py-2.5 bg-brand-emerald hover:bg-brand-emerald-dark text-white font-semibold text-xs rounded-xl transition-all shadow-xs cursor-pointer"
               >
                 Reserve a Table
@@ -56,7 +58,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenL
           {/* Column 2: Service Hours */}
           <div className="space-y-3 text-xs">
             <h4 className="font-bold uppercase tracking-wider text-ink-primary flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-brand-emerald" />
+              <Clock aria-hidden="true" className="w-3.5 h-3.5 text-brand-emerald" />
               <span>Service Hours</span>
             </h4>
             <div className="space-y-2 text-ink-secondary">
@@ -79,7 +81,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenL
           {/* Column 3: Location & Valet */}
           <div className="space-y-3 text-xs">
             <h4 className="font-bold uppercase tracking-wider text-ink-primary flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-brand-emerald" />
+              <MapPin aria-hidden="true" className="w-3.5 h-3.5 text-brand-emerald" />
               <span>Location & Arrival</span>
             </h4>
             <div className="space-y-1.5 text-ink-secondary">
@@ -91,10 +93,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenL
               </p>
               <button
                 onClick={handleDirectionsClick}
+                aria-label="Open Google Maps driving directions to 14 Adeola Odeku Street"
                 className="pt-1 inline-flex items-center gap-1 text-xs font-semibold text-brand-emerald hover:underline cursor-pointer"
               >
                 <span>Get Driving Directions</span>
-                <ArrowUpRight className="w-3.5 h-3.5" />
+                <ArrowUpRight aria-hidden="true" className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
@@ -102,7 +105,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenL
           {/* Column 4: Concierge & Contacts */}
           <div className="space-y-3 text-xs">
             <h4 className="font-bold uppercase tracking-wider text-ink-primary flex items-center gap-1.5">
-              <Phone className="w-3.5 h-3.5 text-brand-emerald" />
+              <Phone aria-hidden="true" className="w-3.5 h-3.5 text-brand-emerald" />
               <span>Direct Inquiries</span>
             </h4>
             <div className="space-y-2 text-ink-secondary">
@@ -110,6 +113,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenL
                 <span className="text-ink-muted block text-[11px]">Host Stand Concierge:</span>
                 <a
                   href="tel:+23414608910"
+                  aria-label="Call Host Stand Concierge at +234 1 460 8910"
                   className="font-mono font-semibold text-ink-primary hover:text-brand-emerald transition-colors"
                 >
                   +234 1 460 8910
@@ -120,9 +124,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenL
                 <span className="text-ink-muted block text-[11px]">Private Dining & Bookings:</span>
                 <a
                   href="mailto:concierge@aduke.lagos.ng"
+                  aria-label="Email Private Dining Concierge at concierge@aduke.lagos.ng"
                   className="text-brand-emerald font-medium hover:underline flex items-center gap-1"
                 >
-                  <Mail className="w-3 h-3" />
+                  <Mail aria-hidden="true" className="w-3 h-3" />
                   <span>concierge@aduke.lagos.ng</span>
                 </a>
               </div>
@@ -159,6 +164,12 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenL
               Culinary Menu
             </button>
             <button
+              onClick={() => onNavigate('tracking')}
+              className="hover:text-ink-primary transition-colors cursor-pointer"
+            >
+              Track Order
+            </button>
+            <button
               onClick={() => onNavigate('reservation')}
               className="hover:text-ink-primary transition-colors cursor-pointer"
             >
@@ -172,6 +183,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookTable, onOpenL
             </button>
             <button
               onClick={handleDirectionsClick}
+              aria-label="Open Google Maps driving directions in new tab"
               className="hover:text-ink-primary transition-colors cursor-pointer"
             >
               Directions

@@ -1,4 +1,4 @@
-import React, { useRef, useState, MouseEvent } from 'react';
+import React, { useRef, useState, useEffect, MouseEvent } from 'react';
 
 interface TiltCardProps {
   children: React.ReactNode;
@@ -17,9 +17,22 @@ export const TiltCard: React.FC<TiltCardProps> = ({
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0, glareX: 50, glareY: 50, opacity: 0 });
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const listener = (event: MediaQueryListEvent) => {
+      setPrefersReducedMotion(event.matches);
+    };
+
+    mediaQuery.addEventListener('change', listener);
+    return () => mediaQuery.removeEventListener('change', listener);
+  }, []);
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
+    if (prefersReducedMotion || !cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -43,8 +56,17 @@ export const TiltCard: React.FC<TiltCardProps> = ({
   };
 
   const handleMouseLeave = () => {
+    if (prefersReducedMotion) return;
     setTilt({ x: 0, y: 0, glareX: 50, glareY: 50, opacity: 0 });
   };
+
+  if (prefersReducedMotion) {
+    return (
+      <div ref={cardRef} onClick={onClick} className={className}>
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div

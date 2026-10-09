@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import {
   MenuItem,
   CartItem,
@@ -12,12 +12,53 @@ import { Hero } from './components/Hero';
 import { MenuSection } from './components/MenuSection';
 import { DishModal } from './components/DishModal';
 import { ReservationSection } from './components/ReservationSection';
+import { OrderTrackingSection } from './components/OrderTrackingSection';
 import { CartDrawer } from './components/CartDrawer';
 import { StorySection } from './components/StorySection';
 import { ReviewsSection } from './components/ReviewsSection';
 import { Footer } from './components/Footer';
 import { CookieConsent } from './components/CookieConsent';
 import { LegalModal } from './components/LegalModal';
+
+/**
+ * Validates parsed data from localStorage to ensure it strictly conforms to CartItem[]
+ * and filters out any items whose IDs no longer exist in the menu.
+ */
+function isValidCart(data: unknown): data is CartItem[] {
+  if (!Array.isArray(data)) return false;
+
+  const validMenuIds = new Set(INITIAL_NIGERIAN_MENU.map((m) => m.id));
+
+  return data.every((entry) => {
+    if (!entry || typeof entry !== 'object') return false;
+
+    const item = entry as Partial<CartItem>;
+
+    const hasValidCartItemId = typeof item.cartItemId === 'string' && item.cartItemId.length > 0;
+    const hasValidItem =
+      item.item &&
+      typeof item.item === 'object' &&
+      typeof item.item.id === 'string' &&
+      validMenuIds.has(item.item.id);
+    const hasValidQuantity =
+      typeof item.quantity === 'number' &&
+      Number.isInteger(item.quantity) &&
+      item.quantity > 0;
+    const hasValidUnitPrice = typeof item.unitPrice === 'number' && Number.isFinite(item.unitPrice);
+    const hasValidTotalPrice =
+      typeof item.totalPrice === 'number' && Number.isFinite(item.totalPrice);
+    const hasValidSelectedOptions = Array.isArray(item.selectedOptions);
+
+    return (
+      hasValidCartItemId &&
+      hasValidItem &&
+      hasValidQuantity &&
+      hasValidUnitPrice &&
+      hasValidTotalPrice &&
+      hasValidSelectedOptions
+    );
+  });
+}
 
 export default function App() {
   const [menu] = useState<MenuItem[]>(INITIAL_NIGERIAN_MENU);
@@ -33,16 +74,22 @@ export default function App() {
   const [isLegalOpen, setIsLegalOpen] = useState(false);
   const [legalTab, setLegalTab] = useState<'privacy' | 'terms'>('privacy');
 
-  // Local Orders list (in-memory demo state)
-  const [, setLocalOrders] = useState<RestaurantOrder[]>([]);
+  // Local Orders list (persisted in session / in-memory demo state)
+  const [localOrders, setLocalOrders] = useState<RestaurantOrder[]>([]);
+  const [activeTrackingOrderId, setActiveTrackingOrderId] = useState<string | null>(null);
 
-  // Cart state with local storage persistence
+  // Cart state with safe runtime validation against schema drift and deleted items
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {
       const saved = localStorage.getItem('aduke_cart_v3');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed: unknown = JSON.parse(saved);
+        if (isValidCart(parsed)) {
+          return parsed;
+        }
+      }
     } catch {
-      // ignore
+      // Discard invalid JSON or read failure
     }
     return [];
   });
@@ -51,7 +98,7 @@ export default function App() {
     try {
       localStorage.setItem('aduke_cart_v3', JSON.stringify(cart));
     } catch {
-      // ignore
+      // LocalStorage full or private browsing quota exceeded
     }
   }, [cart]);
 
@@ -59,7 +106,7 @@ export default function App() {
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = cart.reduce((sum, item) => sum + item.totalPrice, 0);
 
-  // Cart Actions
+  // Cart Actions - Immutable updates recalculating totalPrice from unitPrice * quantity
   const handleAddToCart = (cartItem: CartItem) => {
     setCart((prev) => {
       const existingIdx = prev.findIndex((ci) => {
@@ -72,12 +119,24 @@ export default function App() {
       });
 
       if (existingIdx > -1) {
-        const copy = [...prev];
-        copy[existingIdx].quantity += cartItem.quantity;
-        copy[existingIdx].totalPrice = copy[existingIdx].quantity * copy[existingIdx].unitPrice;
-        return copy;
+        return prev.map((item, idx) => {
+          if (idx !== existingIdx) return item;
+          const nextQty = item.quantity + cartItem.quantity;
+          return {
+            ...item,
+            quantity: nextQty,
+            totalPrice: nextQty * item.unitPrice,
+          };
+        });
       }
-      return [cartItem, ...prev];
+
+      return [
+        {
+          ...cartItem,
+          totalPrice: cartItem.quantity * cartItem.unitPrice,
+        },
+        ...prev,
+      ];
     });
 
     setIsCartOpen(true);
@@ -123,6 +182,12 @@ export default function App() {
 
   const handleOrderPlaced = (order: RestaurantOrder) => {
     setLocalOrders((prev) => [order, ...prev]);
+    setActiveTrackingOrderId(order.id);
+  };
+
+  const handleTrackOrder = (orderId: string) => {
+    setActiveTrackingOrderId(orderId);
+    scrollToSection('tracking');
   };
 
   const handleReservationComplete = (_reservation: TableReservation) => {
@@ -162,8 +227,8 @@ export default function App() {
         onOpenReservation={() => scrollToSection('reservation')}
       />
 
-      {/* Main Content Sections */}
-      <main className="flex-1">
+      {/* Main Content Sections with Accessible Landmark ID */}
+      <main id="main-content" className="flex-1">
         <Hero
           onBookTable={() => scrollToSection('reservation')}
           onExploreMenu={() => scrollToSection('menu')}
@@ -173,6 +238,13 @@ export default function App() {
           menu={menu}
           onSelectDish={(dish) => setSelectedDish(dish)}
           onQuickAdd={handleQuickAdd}
+        />
+
+        <OrderTrackingSection
+          orders={localOrders}
+          activeOrderId={activeTrackingOrderId}
+          onSelectOrder={(orderId) => setActiveTrackingOrderId(orderId)}
+          onExploreMenu={() => scrollToSection('menu')}
         />
 
         <ReservationSection
@@ -204,6 +276,7 @@ export default function App() {
         onRemoveItem={handleRemoveFromCart}
         onClearCart={handleClearCart}
         onOrderPlaced={handleOrderPlaced}
+        onTrackOrder={handleTrackOrder}
       />
 
       {/* Dish Customization Modal */}

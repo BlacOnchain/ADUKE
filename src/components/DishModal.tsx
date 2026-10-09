@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Plus, Minus, Clock, Check } from 'lucide-react';
 import { MenuItem, CartItem, formatNaira } from '../types/restaurant';
 
@@ -9,17 +9,23 @@ interface DishModalProps {
 }
 
 export const DishModal: React.FC<DishModalProps> = ({ item, onClose, onAddToCart }) => {
-  if (!item) return null;
-
   const [quantity, setQuantity] = useState(1);
   const [selectedOptions, setSelectedOptions] = useState<{
     [groupId: string]: { optionId: string; optionName: string; price: number };
   }>({});
   const [specialInstructions, setSpecialInstructions] = useState('');
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedElement = useRef<HTMLElement | null>(null);
 
-  // Initialize required options
+  // Initialize required options & dialog accessibility
   useEffect(() => {
-    if (item && item.customizationGroups) {
+    if (!item) return;
+
+    previouslyFocusedElement.current = document.activeElement as HTMLElement;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    if (item.customizationGroups) {
       const initial: { [groupId: string]: { optionId: string; optionName: string; price: number } } = {};
       item.customizationGroups.forEach((group) => {
         if (group.required && group.options.length > 0) {
@@ -34,7 +40,52 @@ export const DishModal: React.FC<DishModalProps> = ({ item, onClose, onAddToCart
       setQuantity(1);
       setSpecialInstructions('');
     }
-  }, [item]);
+
+    // Focus close button or first action
+    const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusable && focusable.length > 0) {
+      focusable[0].focus();
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        if (!dialogRef.current) return;
+        const focusables = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusables.length) return;
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+      previouslyFocusedElement.current?.focus();
+    };
+  }, [item, onClose]);
+
+  if (!item) return null;
 
   // Options price calculation
   const optionsTotal = Object.values(selectedOptions).reduce((sum, opt) => sum + opt.price, 0);
@@ -43,7 +94,7 @@ export const DishModal: React.FC<DishModalProps> = ({ item, onClose, onAddToCart
 
   const handleSelectOption = (
     groupId: string,
-    groupTitle: string,
+    _groupTitle: string,
     optionId: string,
     optionName: string,
     price: number
@@ -96,17 +147,25 @@ export const DishModal: React.FC<DishModalProps> = ({ item, onClose, onAddToCart
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto"
+      onClick={onClose}
+    >
       <div 
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="dish-modal-title"
         className="relative w-full max-w-lg bg-surface-pure border border-surface-hairline rounded-3xl overflow-hidden shadow-2xl my-8 text-left animate-pop-in"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
+          aria-label={`Close ${item.name} details dialog`}
           className="absolute top-4 right-4 z-10 p-2 rounded-full bg-surface-pure/90 text-ink-primary hover:bg-surface-pure shadow-md transition-colors cursor-pointer"
         >
-          <X className="w-5 h-5" />
+          <X aria-hidden="true" className="w-5 h-5" />
         </button>
 
         {/* Dish Hero Image */}
@@ -123,7 +182,7 @@ export const DishModal: React.FC<DishModalProps> = ({ item, onClose, onAddToCart
             <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand-emerald text-white">
               {item.category.toUpperCase()}
             </span>
-            <h2 className="font-display text-2xl font-bold text-white mt-1">
+            <h2 id="dish-modal-title" className="font-display text-2xl font-bold text-white mt-1">
               {item.name}
             </h2>
             {item.yorubaName && (
@@ -143,14 +202,14 @@ export const DishModal: React.FC<DishModalProps> = ({ item, onClose, onAddToCart
             </p>
             <div className="flex items-center gap-3 text-xs font-mono text-ink-muted pt-1">
               <span className="flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-brand-emerald" />
+                <Clock aria-hidden="true" className="w-3.5 h-3.5 text-brand-emerald" />
                 <span>{item.prepTimeMinutes} mins</span>
               </span>
-              <span>·</span>
+              <span aria-hidden="true">·</span>
               <span>{item.calories} Calories</span>
               {item.pairing && (
                 <>
-                  <span>·</span>
+                  <span aria-hidden="true">·</span>
                   <span className="text-brand-terracotta font-sans truncate">{item.pairing}</span>
                 </>
               )}
@@ -159,17 +218,17 @@ export const DishModal: React.FC<DishModalProps> = ({ item, onClose, onAddToCart
 
           {/* Customization Options */}
           {item.customizationGroups?.map((group) => (
-            <div key={group.id} className="space-y-2 pt-3 border-t border-surface-muted">
-              <div className="flex items-center justify-between">
+            <fieldset key={group.id} className="space-y-2 pt-3 border-t border-surface-muted">
+              <legend className="flex items-center justify-between w-full">
                 <span className="text-xs font-bold text-ink-primary uppercase tracking-wider">
                   {group.title}
                 </span>
                 <span className="text-[11px] text-ink-muted">
                   {group.required ? 'Required (Choose 1)' : 'Optional'}
                 </span>
-              </div>
+              </legend>
 
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 pt-1">
                 {group.options.map((opt) => {
                   const isChecked = group.required
                     ? selectedOptions[group.id]?.optionId === opt.id
@@ -179,6 +238,8 @@ export const DishModal: React.FC<DishModalProps> = ({ item, onClose, onAddToCart
                     <button
                       key={opt.id}
                       type="button"
+                      role={group.required ? 'radio' : 'checkbox'}
+                      aria-checked={isChecked}
                       onClick={() => {
                         if (group.required) {
                           handleSelectOption(group.id, group.title, opt.id, opt.name, opt.price);
@@ -200,7 +261,7 @@ export const DishModal: React.FC<DishModalProps> = ({ item, onClose, onAddToCart
                               : 'border-surface-hairline bg-surface-pure'
                           }`}
                         >
-                          {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                          {isChecked && <Check aria-hidden="true" className="w-3 h-3 stroke-[3]" />}
                         </div>
                         <span>{opt.name}</span>
                       </div>
@@ -212,15 +273,16 @@ export const DishModal: React.FC<DishModalProps> = ({ item, onClose, onAddToCart
                   );
                 })}
               </div>
-            </div>
+            </fieldset>
           ))}
 
           {/* Kitchen Special Requests */}
           <div className="space-y-1.5 pt-3 border-t border-surface-muted">
-            <label className="block text-xs font-bold text-ink-primary uppercase tracking-wider">
+            <label htmlFor="chef-special-notes" className="block text-xs font-bold text-ink-primary uppercase tracking-wider">
               Dietary Instructions for the Chef
             </label>
             <input
+              id="chef-special-notes"
               type="text"
               placeholder="e.g. Extra yaji pepper on the side, allergic to crustaceans..."
               value={specialInstructions}
@@ -235,19 +297,23 @@ export const DishModal: React.FC<DishModalProps> = ({ item, onClose, onAddToCart
           {/* Quantity Stepper */}
           <div className="flex items-center gap-3 bg-surface-pure border border-surface-hairline rounded-xl px-2 py-1.5 shadow-2xs">
             <button
+              type="button"
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              aria-label={`Decrease quantity of ${item.name}`}
               className="p-1 hover:text-brand-emerald transition-colors cursor-pointer"
             >
-              <Minus className="w-3.5 h-3.5" />
+              <Minus aria-hidden="true" className="w-3.5 h-3.5" />
             </button>
-            <span className="font-mono text-xs font-bold w-6 text-center tabular-nums text-ink-primary">
+            <span aria-label={`Current quantity: ${quantity}`} className="font-mono text-xs font-bold w-6 text-center tabular-nums text-ink-primary">
               {quantity}
             </span>
             <button
+              type="button"
               onClick={() => setQuantity(quantity + 1)}
+              aria-label={`Increase quantity of ${item.name}`}
               className="p-1 hover:text-brand-emerald transition-colors cursor-pointer"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus aria-hidden="true" className="w-3.5 h-3.5" />
             </button>
           </div>
 
@@ -255,6 +321,7 @@ export const DishModal: React.FC<DishModalProps> = ({ item, onClose, onAddToCart
           <button
             type="button"
             onClick={handleAdd}
+            aria-label={`Add ${quantity} ${item.name} to bag for ${formatNaira(totalPrice)}`}
             className="btn-interactive flex-1 py-3.5 px-4 bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-sm flex items-center justify-between cursor-pointer"
           >
             <span>Add to Culinary Bag</span>
