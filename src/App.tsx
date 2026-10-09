@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useId } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Toaster, toast } from 'sonner';
 import {
   MenuItem,
   CartItem,
   RestaurantOrder,
+  OrderStatus,
   TableReservation,
   CustomerReview,
 } from './types/restaurant';
@@ -21,42 +23,62 @@ import { CookieConsent } from './components/CookieConsent';
 import { LegalModal } from './components/LegalModal';
 
 /**
- * Validates parsed data from localStorage to ensure it strictly conforms to CartItem[]
- * and filters out any items whose IDs no longer exist in the menu.
+ * Validates individual cart item structure non-destructively against the menu catalog.
  */
-function isValidCart(data: unknown): data is CartItem[] {
-  if (!Array.isArray(data)) return false;
+function isValidCartItem(entry: unknown, validMenuIds: Set<string>): entry is CartItem {
+  if (!entry || typeof entry !== 'object') return false;
 
+  const item = entry as Partial<CartItem>;
+  const hasValidCartItemId = typeof item.cartItemId === 'string' && item.cartItemId.length > 0;
+  const hasValidItem =
+    item.item &&
+    typeof item.item === 'object' &&
+    typeof item.item.id === 'string' &&
+    validMenuIds.has(item.item.id);
+  const hasValidQuantity =
+    typeof item.quantity === 'number' &&
+    Number.isInteger(item.quantity) &&
+    item.quantity > 0;
+  const hasValidUnitPrice = typeof item.unitPrice === 'number' && Number.isFinite(item.unitPrice);
+  const hasValidTotalPrice =
+    typeof item.totalPrice === 'number' && Number.isFinite(item.totalPrice);
+  const hasValidSelectedOptions = Array.isArray(item.selectedOptions);
+
+  return Boolean(
+    hasValidCartItemId &&
+    hasValidItem &&
+    hasValidQuantity &&
+    hasValidUnitPrice &&
+    hasValidTotalPrice &&
+    hasValidSelectedOptions
+  );
+}
+
+/**
+ * Non-destructive Cart loader: filters out corrupted/stale entries instead of wiping the user's cart.
+ */
+function sanitizeSavedCart(data: unknown): CartItem[] {
+  if (!Array.isArray(data)) return [];
+  const validMenuIds = new Set(INITIAL_NIGERIAN_MENU.map((m) => m.id));
+  return data.filter((entry): entry is CartItem => isValidCartItem(entry, validMenuIds));
+}
+
+/**
+ * Non-destructive Order history loader: filters out corrupted order records.
+ */
+function sanitizeSavedOrders(data: unknown): RestaurantOrder[] {
+  if (!Array.isArray(data)) return [];
   const validMenuIds = new Set(INITIAL_NIGERIAN_MENU.map((m) => m.id));
 
-  return data.every((entry) => {
+  return data.filter((entry): entry is RestaurantOrder => {
     if (!entry || typeof entry !== 'object') return false;
-
-    const item = entry as Partial<CartItem>;
-
-    const hasValidCartItemId = typeof item.cartItemId === 'string' && item.cartItemId.length > 0;
-    const hasValidItem =
-      item.item &&
-      typeof item.item === 'object' &&
-      typeof item.item.id === 'string' &&
-      validMenuIds.has(item.item.id);
-    const hasValidQuantity =
-      typeof item.quantity === 'number' &&
-      Number.isInteger(item.quantity) &&
-      item.quantity > 0;
-    const hasValidUnitPrice = typeof item.unitPrice === 'number' && Number.isFinite(item.unitPrice);
-    const hasValidTotalPrice =
-      typeof item.totalPrice === 'number' && Number.isFinite(item.totalPrice);
-    const hasValidSelectedOptions = Array.isArray(item.selectedOptions);
-
-    return (
-      hasValidCartItemId &&
-      hasValidItem &&
-      hasValidQuantity &&
-      hasValidUnitPrice &&
-      hasValidTotalPrice &&
-      hasValidSelectedOptions
-    );
+    const ord = entry as Partial<RestaurantOrder>;
+    const hasId = typeof ord.id === 'string' && ord.id.length > 0;
+    const hasOrderNumber = typeof ord.orderNumber === 'string';
+    const hasTotal = typeof ord.total === 'number' && Number.isFinite(ord.total);
+    const hasItems = Array.isArray(ord.items) && ord.items.length > 0;
+    const validItems = hasItems && ord.items!.every((it) => isValidCartItem(it, validMenuIds));
+    return Boolean(hasId && hasOrderNumber && hasTotal && validItems);
   });
 }
 
@@ -68,41 +90,61 @@ export default function App() {
   // Active section for smooth scrolling
   const [activeSection, setActiveSection] = useState<string>('hero');
 
-  // Modals
+  // Modals & Drawers
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedDish, setSelectedDish] = useState<MenuItem | null>(null);
   const [isLegalOpen, setIsLegalOpen] = useState(false);
   const [legalTab, setLegalTab] = useState<'privacy' | 'terms'>('privacy');
 
-  // Local Orders list (persisted in session / in-memory demo state)
-  const [localOrders, setLocalOrders] = useState<RestaurantOrder[]>([]);
+  // Orders list: Persisted across sessions via localStorage with non-destructive validation
+  const [localOrders, setLocalOrders] = useState<RestaurantOrder[]>(() => {
+    try {
+      const saved = localStorage.getItem('aduke_orders_v1');
+      if (saved) {
+        const parsed: unknown = JSON.parse(saved);
+        return sanitizeSavedOrders(parsed);
+      }
+    } catch {
+      // Ignore read failure and default to empty array
+    }
+    return [];
+  });
+
   const [activeTrackingOrderId, setActiveTrackingOrderId] = useState<string | null>(null);
 
-  // Cart state with safe runtime validation against schema drift and deleted items
+  // Cart state: Non-destructive filtering
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {
       const saved = localStorage.getItem('aduke_cart_v3');
       if (saved) {
         const parsed: unknown = JSON.parse(saved);
-        if (isValidCart(parsed)) {
-          return parsed;
-        }
+        return sanitizeSavedCart(parsed);
       }
     } catch {
-      // Discard invalid JSON or read failure
+      // Discard read failure
     }
     return [];
   });
 
+  // Sync cart to localStorage
   useEffect(() => {
     try {
       localStorage.setItem('aduke_cart_v3', JSON.stringify(cart));
     } catch {
-      // LocalStorage full or private browsing quota exceeded
+      // LocalStorage full or private browsing quota
     }
   }, [cart]);
 
-  // Cart calculations
+  // Sync orders to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('aduke_orders_v1', JSON.stringify(localOrders));
+    } catch {
+      // LocalStorage full
+    }
+  }, [localOrders]);
+
+  // Cart metrics
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = cart.reduce((sum, item) => sum + item.totalPrice, 0);
 
@@ -183,6 +225,9 @@ export default function App() {
   const handleOrderPlaced = (order: RestaurantOrder) => {
     setLocalOrders((prev) => [order, ...prev]);
     setActiveTrackingOrderId(order.id);
+    toast.success(`Order #${order.orderNumber} placed!`, {
+      description: 'Your woodfire culinary experience has been transmitted to our chefs.',
+    });
   };
 
   const handleTrackOrder = (orderId: string) => {
@@ -190,12 +235,37 @@ export default function App() {
     scrollToSection('tracking');
   };
 
+  const handleUpdateOrderStatus = (orderId: string, status: OrderStatus) => {
+    setLocalOrders((prev) =>
+      prev.map((ord) => (ord.id === orderId ? { ...ord, status } : ord))
+    );
+  };
+
+  // 1-Click Re-order action: takes an array of CartItems and immutably adds them to the cart
+  const handleReorder = (items: CartItem[]) => {
+    items.forEach((item) => {
+      // Re-generate fresh cart item ID
+      const reorderedItem: CartItem = {
+        ...item,
+        cartItemId: `${item.item.id}-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        totalPrice: item.quantity * item.unitPrice,
+      };
+      handleAddToCart(reorderedItem);
+    });
+    setIsCartOpen(true);
+  };
+
   const handleReservationComplete = (_reservation: TableReservation) => {
-    // Local reservation confirmed
+    toast.success('Table reservation confirmed', {
+      description: 'We eagerly anticipate welcoming you to our Victoria Island hearth.',
+    });
   };
 
   const handleAddReview = (review: CustomerReview) => {
     setReviews((prev) => [review, ...prev]);
+    toast.success('Review published', {
+      description: 'Thank you for sharing your dining experience with Àdùkẹ́.',
+    });
   };
 
   const scrollToSection = (sectionId: string) => {
@@ -217,6 +287,17 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-surface-canvas text-ink-primary flex flex-col selection:bg-brand-emerald selection:text-white">
+      {/* Toast Notification Provider */}
+      <Toaster position="top-right" richColors closeButton />
+
+      {/* Accessible Root Skip to Main Content Link */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 px-4 py-2 bg-brand-emerald text-white text-xs font-bold rounded-xl shadow-lg ring-2 ring-white transition-all"
+      >
+        Skip to main content
+      </a>
+
       {/* Top Bar Navigation */}
       <Navbar
         activeSection={activeSection}
@@ -245,6 +326,8 @@ export default function App() {
           activeOrderId={activeTrackingOrderId}
           onSelectOrder={(orderId) => setActiveTrackingOrderId(orderId)}
           onExploreMenu={() => scrollToSection('menu')}
+          onReorder={handleReorder}
+          onUpdateOrderStatus={handleUpdateOrderStatus}
         />
 
         <ReservationSection

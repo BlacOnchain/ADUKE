@@ -31,7 +31,7 @@ export const Hero: React.FC<HeroProps> = ({
             
             {/* Clean, authentic restaurant badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-emerald-light text-brand-emerald text-xs font-semibold">
-              <span className="w-2 h-2 rounded-full bg-brand-emerald animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-brand-emerald" />
               <span>Victoria Island, Lagos · Open Hearth Dining</span>
             </div>
 
@@ -100,7 +100,7 @@ export const Hero: React.FC<HeroProps> = ({
                   {/* Top Simple Tag */}
                   <div className="absolute top-4 left-4">
                     <span className="px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white text-xs font-semibold flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-[#4ADE80] animate-pulse" />
+                      <span className="w-2 h-2 rounded-full bg-brand-emerald" />
                       Victoria Island Dining Room
                     </span>
                   </div>
